@@ -1,0 +1,16 @@
+Make in game text editor for editing scripts
+Make a font for in game and menus
+Design the main character
+Design the XML format for the levels (and how they are loaded)
+Implement in game objects
+Make tiles for in levels
+Setup static methods for HTTP requests
+Implement scoring algorithms
+Make objects run scripts
+Do a bunch of GUI buttons
+Do all of the various other art stuff
+Build some default levels (10???)
+Do the coding skill test level
+Do the main menu
+Do the score screen
+Do the high scores list (need Levi to do the server code)
