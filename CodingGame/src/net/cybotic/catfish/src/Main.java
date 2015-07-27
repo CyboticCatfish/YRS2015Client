@@ -1,7 +1,10 @@
 package net.cybotic.catfish.src;
 
+import net.cybotic.catfish.src.game.Game;
+
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -29,7 +32,17 @@ public class Main extends StateBasedGame {
 	@Override
 	public void initStatesList(GameContainer gc) throws SlickException {
 		
+		this.addState(new Game());
+		this.enterState(0);
 		
+	}
+	
+	public static Image loadImage(String file) throws SlickException {
+		
+		Image temp = new Image(file);
+		temp.setFilter(Image.FILTER_NEAREST);
+		
+		return temp.getScaledCopy(3f);
 		
 	}
 	

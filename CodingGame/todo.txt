@@ -1,4 +1,4 @@
-Make in game text editor for editing scripts
+Make in game text editor for editing scripts ----> Done but need to add proper GUI and link to game objects
 Make a font for in game and menus
 Design the main character
 Design the XML format for the levels (and how they are loaded)

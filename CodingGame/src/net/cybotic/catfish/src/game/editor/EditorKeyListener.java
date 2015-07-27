@@ -7,9 +7,11 @@ import org.newdawn.slick.KeyListener;
 
 public class EditorKeyListener implements KeyListener {
 	
-	public EditorKeyListener(Game game, EditorPane pane) {
+	private Game game;
+	
+	public EditorKeyListener(Game game) {
 		
-		
+		this.game = game;
 		
 	}
 	
@@ -26,7 +28,7 @@ public class EditorKeyListener implements KeyListener {
 	@Override
 	public boolean isAcceptingInput() {
 		
-		return false;
+		return game.isEditorOpen();
 		
 	}
 
@@ -38,6 +40,44 @@ public class EditorKeyListener implements KeyListener {
 	@Override
 	public void keyPressed(int id, char character) {
 		
+		if (id < 58 && id != 1 && id != 14 && id != 15 && id != 28 && id != 29 && id != 41 && id != 42 && id != 54) {
+			
+			game.getCurrentEditor().appendCharacter(character);
+			
+			if (character == '{') {
+				
+				game.getCurrentEditor().appendCharacter('}');
+				game.getCurrentEditor().cursorLeft();
+				
+			} else if (character == '[') {
+				
+				game.getCurrentEditor().appendCharacter(']');
+				game.getCurrentEditor().cursorLeft();
+				
+			} else if (character == '(') {
+				
+				game.getCurrentEditor().appendCharacter(')');
+				game.getCurrentEditor().cursorLeft();
+				
+			} else if (character == '"') {
+				
+				game.getCurrentEditor().appendCharacter('"');
+				game.getCurrentEditor().cursorLeft();
+				
+			} else if (character == '\'') {
+				
+				game.getCurrentEditor().appendCharacter('\'');
+				game.getCurrentEditor().cursorLeft();
+				
+			} 
+			
+		} else if (id == 14) game.getCurrentEditor().backSpace();
+		else if (id == 28) game.getCurrentEditor().newLine();
+		else if (id == 203) game.getCurrentEditor().cursorLeft();
+		else if (id == 205) game.getCurrentEditor().cursorRight();
+		else if (id == 200) game.getCurrentEditor().cursorUp();
+		else if (id == 208) game.getCurrentEditor().cursorDown();
+		
 	}
 
 	@Override
@@ -45,6 +85,4 @@ public class EditorKeyListener implements KeyListener {
 		
 	}
 
-	
-	
 }
