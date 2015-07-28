@@ -84,10 +84,6 @@ public class EditorKeyListener implements KeyListener {
 			game.getCurrentEditor().cursorRight();
 			game.getCurrentEditor().cursorRight();
 			
-		} else if (id == 1) {
-			
-			game.getCurrentEditor().close();
-			
 		}
 		
 	}

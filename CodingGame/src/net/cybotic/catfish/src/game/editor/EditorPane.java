@@ -3,6 +3,7 @@ package net.cybotic.catfish.src.game.editor;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.cybotic.catfish.src.Main;
 import net.cybotic.catfish.src.game.Game;
 import net.cybotic.catfish.src.game.object.GameObject;
 
@@ -11,6 +12,8 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.gui.MouseOverArea;
 
 public class EditorPane {
 	
@@ -20,25 +23,48 @@ public class EditorPane {
 	private boolean firstPress = true, cursorShow = false, closing = false;
 	private Game game;
 	private GameObject object;
+	private MouseOverArea start, exit, stop;
+	private SpriteSheet buttons;
 	
-	
-	public EditorPane(Game game, GameObject target) throws SlickException {
+	public EditorPane(Game game, GameObject target, GameContainer gc) throws SlickException {
 		
 		String[] script = target.getScript().split("\n");
 		for (int i = 0; i < script.length; i++) currentScript.add(script[i]);
 		
 		this.game = game;
 		this.object = target;
+		this.buttons = new SpriteSheet(Main.loadImage("res/buttons.png"), 36, 36);
 		
+		start = new MouseOverArea(gc, buttons.getSubImage(0, 0), gc.getWidth() - 40, gc.getHeight() - 40);
+			start.setMouseOverImage(buttons.getSubImage(1, 0));
+			start.setMouseDownImage(buttons.getSubImage(2, 0));
+			
+		exit = new MouseOverArea(gc, buttons.getSubImage(0, 1), gc.getWidth() - 190, gc.getHeight() - 40);
+			exit.setMouseOverImage(buttons.getSubImage(1, 1));
+			exit.setMouseDownImage(buttons.getSubImage(2, 1));
+			
+		stop = new MouseOverArea(gc, buttons.getSubImage(0, 2), gc.getWidth() - 80, gc.getHeight() - 40);
+			stop.setMouseOverImage(buttons.getSubImage(1, 2));
+			stop.setMouseDownImage(buttons.getSubImage(2, 2));
+
 	}
 	
 	public void appendCharacter(char character) {
 		
-		String start = currentScript.get(currentLine).substring(0, cursorPosition);
-		String end = currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length());
+		if (currentScript.get(currentLine).length() < 29) {
 		
-		currentScript.set(currentLine, start + character + end);
-		cursorPosition += 1;
+			String start = currentScript.get(currentLine).substring(0, cursorPosition);
+			String end = currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length());
+			
+			currentScript.set(currentLine, start + character + end);
+			cursorPosition += 1;
+		
+		} else {
+			
+			this.newLine();
+			this.appendCharacter(character);
+			
+		}
 		
 	}
 	
@@ -96,6 +122,14 @@ public class EditorPane {
 		for (int i = 0; i < currentScript.size(); i++) g.drawString(currentScript.get(i), gc.getWidth() - x + 8, 3 + i * 13);
 		if (cursorShow) g.drawLine(gc.getWidth() - x + 8 + cursorPosition * 6.55f, 3 + currentLine * 13f, gc.getWidth() - x + 8 + cursorPosition * 6.55f, 15 + currentLine * 13f);
 		
+		g.translate(- x + 200, 0);
+		
+		start.render(gc, g);
+		exit.render(gc, g);
+		stop.render(gc, g);
+		
+		g.resetTransform();
+		
 	}
 
 	public String getCurrentScript() {
@@ -117,11 +151,32 @@ public class EditorPane {
 
 	public void update(GameContainer gc, int delta) {
 		
+		if (x < 200f && this.game.isEditorOpen()) x += 1f * delta;
+		else if (x > 200f && this.game.isEditorOpen()) x = 200f;
+		else if (x >= 0f && !this.game.isEditorOpen()) x -= 1f * delta;
+		
 		if (closing) game.closeEditor(gc);
 		else {
-		
-			if (x < 200f && this.game.isEditorOpen()) x += 1f * delta;
-			else if (x > 0f && !this.game.isEditorOpen()) x -= 1f * delta;
+			
+			if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+				
+				if (start.isMouseOver()) {
+					
+					this.getTarget().setScript(this.getCurrentScript());
+					this.getTarget().runScript();
+					
+				} else if (exit.isMouseOver()) {
+					
+					this.getTarget().setScript(this.getCurrentScript());
+					this.close();
+					
+				} else if (stop.isMouseOver() &&  object.isScriptRunning()) {
+					
+					this.getTarget().getScriptEnv().interupt();
+					
+				}
+				
+			}
 			
 			flash += 0.1f * delta;
 			if (flash > 30f) {
@@ -170,10 +225,14 @@ public class EditorPane {
 
 	public void newLine() {
 		
-		currentScript.add(currentLine + 1, currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length()));
-		currentScript.set(currentLine, currentScript.get(currentLine).substring(0, cursorPosition));
-		currentLine += 1;
-		cursorPosition = 0;
+		if (currentScript.size() < 42) {
+		
+			currentScript.add(currentLine + 1, currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length()));
+			currentScript.set(currentLine, currentScript.get(currentLine).substring(0, cursorPosition));
+			currentLine += 1;
+			cursorPosition = 0;
+		
+		}
 		
 	}
 

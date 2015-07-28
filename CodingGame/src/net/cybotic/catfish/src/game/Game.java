@@ -10,7 +10,6 @@ import net.cybotic.catfish.src.game.object.Test;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
@@ -50,11 +49,7 @@ public class Game extends BasicGameState {
 		
 		if (!g.getFont().equals(FONT)) g.setFont(FONT);
 		
-		if (this.isEditorOpen()) {
-			
-			currentEditor.render(gc, g);
-			
-		}
+		if (this.currentEditor != null) currentEditor.render(gc, g);
 		
 		for (GameObject object : objects) {
 			
@@ -69,11 +64,7 @@ public class Game extends BasicGameState {
 	public void update(GameContainer gc, StateBasedGame sbg, int delta)
 			throws SlickException {
 		
-		if (this.isEditorOpen()) {
-			
-			currentEditor.update(gc, delta);
-			
-		}
+		if (this.currentEditor != null) currentEditor.update(gc, delta);
 		
 		for (GameObject object : objects) {
 			
@@ -97,19 +88,16 @@ public class Game extends BasicGameState {
 		
 	}
 	
-	public void openEditor(GameObject object) throws SlickException {
+	public void openEditor(GameObject object, GameContainer gc) throws SlickException {
 		
-		this.currentEditor = new EditorPane(this, object);
+		this.currentEditor = new EditorPane(this, object, gc);
 		this.editorOpen = true;
 		
 	}
 
 	public void closeEditor(GameContainer gc) {
 		
-		editorOpen = false;
-		
-		this.currentEditor.getTarget().setScript(this.currentEditor.getCurrentScript());
-		this.currentEditor.getTarget().runScript();
+		this.editorOpen = false;
 		
 	}
 

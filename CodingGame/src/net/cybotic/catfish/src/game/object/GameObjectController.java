@@ -3,6 +3,7 @@ package net.cybotic.catfish.src.game.object;
 public class GameObjectController {
 	
 	private GameObject target;
+	private boolean enabled = true;
 	
 	public GameObjectController(GameObject target) {
 		
@@ -12,69 +13,85 @@ public class GameObjectController {
 	
 	public void moveForward() {
 		
-		while (target.isMoving()) {
-			
-			try {
+		if (enabled) {
+		
+			while (target.isMoving()) {
 				
-				Thread.sleep(50);
-				
-			} catch (InterruptedException e) {
-				
-				e.printStackTrace();
+				try {
+					
+					Thread.sleep(50);
+					
+				} catch (InterruptedException e) {
+					
+					e.printStackTrace();
+					
+				}
 				
 			}
 			
-		}
+			target.moveForward();
 		
-		target.moveForward();
+		}
 		
 	}
 	
 	public void turnClockwise() {
 		
-		while (target.isMoving()) {
-			
-			try {
+		if (enabled) {
+		
+			while (target.isMoving()) {
 				
-				Thread.sleep(50);
-				
-			} catch (InterruptedException e) {
-				
-				e.printStackTrace();
+				try {
+					
+					Thread.sleep(50);
+					
+				} catch (InterruptedException e) {
+					
+					e.printStackTrace();
+					
+				}
 				
 			}
 			
+			target.turnClockwise();
+		
 		}
-		
-		
-		
-		target.turnClockwise();
 		
 	}
 	
 	public void turnAntiClockwise() {
 		
-		while (target.isMoving()) {
-			
-			try {
+		if (enabled) {
+		
+			while (target.isMoving()) {
 				
-				Thread.sleep(50);
-				
-			} catch (InterruptedException e) {
-				
-				e.printStackTrace();
+				try {
+					
+					Thread.sleep(50);
+					
+				} catch (InterruptedException e) {
+					
+					e.printStackTrace();
+					
+				}
 				
 			}
 			
-		}
+			target.turnAntiClockwise();
 		
-		target.turnAntiClockwise();
+		}
 		
 	}
 	
 	public void interact() {
 		
 		//TODO make interacted with execute on the nearest object
+		
+	}
+	
+	public void disable() {
+		
+		enabled = false;
 		
 	}
 	

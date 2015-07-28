@@ -3,7 +3,6 @@ package net.cybotic.catfish.src.game.object;
 import net.cybotic.catfish.src.game.Game;
 import net.cybotic.catfish.src.script.ScriptEnv;
 
-import org.lwjgl.input.Mouse;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -38,11 +37,11 @@ public abstract class GameObject {
 	
 	public void preUpdate(GameContainer gc, int delta) throws SlickException {
 		
-		if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON) && this.scriptable
+		if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON) && this.scriptable && !game.isEditorOpen()
 				&& gc.getInput().getAbsoluteMouseX() < this.getRenderingX() + 64 && gc.getInput().getAbsoluteMouseX() > this.getRenderingX()
 				&& gc.getInput().getAbsoluteMouseY() < this.getRenderingY() + 64 && gc.getInput().getAbsoluteMouseY() > this.getRenderingY()) {
 			
-			this.game.openEditor(this);
+			this.game.openEditor(this, gc);
 			
 		}
 		
@@ -72,6 +71,7 @@ public abstract class GameObject {
 		if (!scriptRunning && this.scriptable) {
 		
 			scriptEnv.launchScript();
+			scriptRunning = true;
 			
 		}
 		
@@ -139,6 +139,24 @@ public abstract class GameObject {
 	public void interact() {
 		
 		//TODO make interacted with execute on the nearest object
+		
+	}
+	
+	public ScriptEnv getScriptEnv() {
+		
+		return this.scriptEnv;
+		
+	}
+
+	public void scriptComplete() {
+		
+		this.scriptRunning = false;
+		
+	}
+
+	public boolean isScriptRunning() {
+	
+		return scriptRunning;
 		
 	}
 	

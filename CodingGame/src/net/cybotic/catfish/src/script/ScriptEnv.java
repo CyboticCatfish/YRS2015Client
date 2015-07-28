@@ -11,6 +11,8 @@ import org.mozilla.javascript.*;
 public class ScriptEnv {
 	
 	private GameObject target;
+	private GameObjectController controller;
+	private Thread scriptThread;
 	
 	public ScriptEnv(GameObject target) {
 		
@@ -19,7 +21,17 @@ public class ScriptEnv {
 	
 	public void launchScript() {
 		
-		(new Thread(new ScriptThread())).start();
+		scriptThread = new Thread(new ScriptThread());
+		scriptThread.start();
+		
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void interupt() {
+		
+		controller.disable();
+		target.scriptComplete();
+		scriptThread.stop();
 		
 	}
 
@@ -31,14 +43,17 @@ public class ScriptEnv {
 			Context context = Context.enter();
 			Scriptable scope = context.initStandardObjects();
 			
-            scope.put("object", scope, new GameObjectController(target));
+			controller = new GameObjectController(target);
+			
+            scope.put("object", scope, controller);
 
             Script executable;
 			
             try {
 				
-            	executable = context.compileReader(new StringReader(target.getScript()), "", 1, null);
+            	executable = context.compileReader(new StringReader(target.getScript().replaceAll("\n", "")), "", 1, null);
 				executable.exec(context, scope);
+				target.scriptComplete();
 				
 			} catch (IOException e) {
 				
