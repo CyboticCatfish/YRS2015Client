@@ -1,94 +1,53 @@
 package net.cybotic.catfish.src.script;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+
+import net.cybotic.catfish.src.game.object.GameObject;
+import net.cybotic.catfish.src.game.object.GameObjectController;
 
 import org.mozilla.javascript.*;
 
 public class ScriptEnv {
 	
-	public class JSObject {
+	private GameObject target;
 	
-		public Object object;
-		public String name;
+	public ScriptEnv(GameObject target) {
 		
-		public JSObject(Object object, String name) {
-		
-			this.name= name;
-			this.object = object;
-			
-		} 
-		
+		this.target = target;
 	}
 	
-	public Context context;
-	List<JSObject> objects = new ArrayList<JSObject>();
-	
-	public ScriptEnv() {
+	public void launchScript() {
 		
-		context = Context.enter();
+		(new Thread(new ScriptThread())).start();
 		
 	}
 
-	public void addObject(Object object, String name) {
+	public class ScriptThread implements Runnable {
 		
-		objects.add(new JSObject(object, name));
-		
-	}
-	
-	private void addJSObject(JSObject jso, Scriptable scope) {
-		
-		scope.put(jso.name, scope, jso.object);
-		
-	}
-	
-	public boolean launchScript(String script) {
-		
-		boolean result = true;
-		
-		try {
+		@Override
+		public void run() {
 			
-			Context.enter();
+			Context context = Context.enter();
 			Scriptable scope = context.initStandardObjects();
 			
-            for (int i = 0; i < objects.size(); i++) {
-        
-            	addJSObject(objects.get(i), scope);
-            	
-            }
+            scope.put("object", scope, new GameObjectController(target));
 
-            Script executable = context.compileReader(new StringReader(script), "", 1, null);
-            executable.exec(context, scope);
+            Script executable;
+			
+            try {
+				
+            	executable = context.compileReader(new StringReader(target.getScript()), "", 1, null);
+				executable.exec(context, scope);
+				
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+				
+			}
             
-		} catch (Exception e) {
-			
-			result = false;
-			
-		} finally {
-			
-			Context.exit();
-			
 		}
 		
-		return result;
-	}
-	
-	public boolean launchScript(File file) throws IOException {
-		
-		String script = "", s = "";
-		
-		BufferedReader br = new BufferedReader(new FileReader(file));
-		
-		while((s = br.readLine()) != null) script += s;
-		
-		br.close();
-		
-		return this.launchScript(script);
 		
 	}
 }

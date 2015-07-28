@@ -40,7 +40,7 @@ public class EditorKeyListener implements KeyListener {
 	@Override
 	public void keyPressed(int id, char character) {
 		
-		if (id < 58 && id != 1 && id != 14 && id != 15 && id != 28 && id != 29 && id != 41 && id != 42 && id != 54) {
+		if (id < 58 && id != 1 && id != 14 && id != 15 && id != 28 && id != 29 && id != 42 && id != 54) {
 			
 			game.getCurrentEditor().appendCharacter(character);
 			
@@ -77,6 +77,18 @@ public class EditorKeyListener implements KeyListener {
 		else if (id == 205) game.getCurrentEditor().cursorRight();
 		else if (id == 200) game.getCurrentEditor().cursorUp();
 		else if (id == 208) game.getCurrentEditor().cursorDown();
+		else if (id == 15) {
+			
+			game.getCurrentEditor().appendString("   ");
+			game.getCurrentEditor().cursorRight();
+			game.getCurrentEditor().cursorRight();
+			game.getCurrentEditor().cursorRight();
+			
+		} else if (id == 1) {
+			
+			game.getCurrentEditor().close();
+			
+		}
 		
 	}
 

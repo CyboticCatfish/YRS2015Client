@@ -3,31 +3,32 @@ package net.cybotic.catfish.src.game.editor;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.cybotic.catfish.src.Main;
+import net.cybotic.catfish.src.game.Game;
+import net.cybotic.catfish.src.game.object.GameObject;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 public class EditorPane {
 	
 	private List<String> currentScript = new ArrayList<String>();
-	private float editorTimer = 0f, flash = 0f, x, y;
+	private float editorTimer = 0f, flash = 0f, x = 0f;
 	private int cursorPosition = 0, currentLine = 0;
-	private boolean firstPress = true, cursorShow = false;
-	private Image editor;
+	private boolean firstPress = true, cursorShow = false, closing = false;
+	private Game game;
+	private GameObject object;
 	
 	
-	public EditorPane(float x, float y) throws SlickException {
+	public EditorPane(Game game, GameObject target) throws SlickException {
 		
-		currentScript.add("");
+		String[] script = target.getScript().split("\n");
+		for (int i = 0; i < script.length; i++) currentScript.add(script[i]);
 		
-		this.x = x;
-		this.y = y;
-		
-		editor = Main.loadImage("res/editor.png");
+		this.game = game;
+		this.object = target;
 		
 	}
 	
@@ -54,8 +55,15 @@ public class EditorPane {
 		
 		if (currentScript.get(currentLine).length() > 0 && cursorPosition > 0) {
 			
-			String start = currentScript.get(currentLine).substring(0, cursorPosition - 1);
+			String start = currentScript.get(currentLine).substring(0, cursorPosition - 1);			
 			String end = currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length());
+			
+			if (start.endsWith("  ")) {
+			
+				start = currentScript.get(currentLine).substring(0, cursorPosition - 2);
+				cursorPosition -= 2;
+			
+			}
 			
 			currentScript.set(currentLine, start + end);
 			cursorPosition -= 1;
@@ -72,12 +80,21 @@ public class EditorPane {
 		
 	}
 	
-	public void render(Graphics g) {
+	public void render(GameContainer gc, Graphics g) {
 		
-		g.drawImage(editor, x, y);
+		g.setColor(new Color(60, 60 , 60));
+		g.fillRect(gc.getWidth() - x,  0, 200, gc.getHeight());
 		
-		for (int i = 0; i < currentScript.size(); i++) g.drawString(currentScript.get(i), x + 20, y + 20 + i * 13);
-		if (cursorShow) g.drawLine(x + 20 + cursorPosition * 6.55f, y + 20 + currentLine * 13f, x + 20 + cursorPosition * 6.55f, y + 32 + currentLine * 13f);
+		g.setColor(new Color(0, 0 , 0, 70));
+		g.fillRect(gc.getWidth() - x, 3 + 13 * currentLine, 200, 13);
+		
+		g.setColor(new Color(0, 0 , 0, 51));
+		g.fillRect(gc.getWidth() - x,  0, 6, gc.getHeight());
+		
+		g.setColor(Color.white);
+		
+		for (int i = 0; i < currentScript.size(); i++) g.drawString(currentScript.get(i), gc.getWidth() - x + 8, 3 + i * 13);
+		if (cursorShow) g.drawLine(gc.getWidth() - x + 8 + cursorPosition * 6.55f, 3 + currentLine * 13f, gc.getWidth() - x + 8 + cursorPosition * 6.55f, 15 + currentLine * 13f);
 		
 	}
 
@@ -91,48 +108,62 @@ public class EditorPane {
 		
 		
 	}
+	
+	public void done() {
+		
+		
+		
+	}
 
 	public void update(GameContainer gc, int delta) {
 		
-		flash += 0.1f * delta;
-		if (flash > 30f) {
-			
-			cursorShow = !cursorShow;
-			flash = 0f;
-			
-		}
+		if (closing) game.closeEditor(gc);
+		else {
 		
-		if (gc.getInput().isKeyDown(Input.KEY_BACK) ||
-				gc.getInput().isKeyDown(Input.KEY_UP) ||
-				gc.getInput().isKeyDown(Input.KEY_DOWN) ||
-				gc.getInput().isKeyDown(Input.KEY_LEFT) ||
-				gc.getInput().isKeyDown(Input.KEY_RIGHT)) {
+			if (x < 200f && this.game.isEditorOpen()) x += 1f * delta;
+			else if (x > 0f && !this.game.isEditorOpen()) x -= 1f * delta;
 			
-			if (editorTimer < 50f && firstPress) editorTimer += 0.1f * delta;
-			
-			else if (editorTimer  < 5f && !firstPress) editorTimer += 0.1f * delta;
+			flash += 0.1f * delta;
+			if (flash > 30f) {
 				
-			else {
-				
-				if (gc.getInput().isKeyDown(Input.KEY_BACK)) backSpace();
-				else if (gc.getInput().isKeyDown(Input.KEY_UP)) cursorUp();
-				else if (gc.getInput().isKeyDown(Input.KEY_DOWN)) cursorDown();
-				else if (gc.getInput().isKeyDown(Input.KEY_LEFT)) cursorLeft();
-				else if (gc.getInput().isKeyDown(Input.KEY_RIGHT)) cursorRight();
-				
-				firstPress = false;
-				editorTimer = 0f;
+				cursorShow = !cursorShow;
+				flash = 0f;
 				
 			}
 			
-		} else if (!gc.getInput().isKeyDown(Input.KEY_BACK) && 
-				!gc.getInput().isKeyDown(Input.KEY_UP) && 
-				!gc.getInput().isKeyDown(Input.KEY_DOWN) && 
-				!gc.getInput().isKeyDown(Input.KEY_LEFT) && 
-				!gc.getInput().isKeyDown(Input.KEY_RIGHT)) {
-			
-			firstPress = true;
-			editorTimer = 0f;
+			if (gc.getInput().isKeyDown(Input.KEY_BACK) ||
+					gc.getInput().isKeyDown(Input.KEY_UP) ||
+					gc.getInput().isKeyDown(Input.KEY_DOWN) ||
+					gc.getInput().isKeyDown(Input.KEY_LEFT) ||
+					gc.getInput().isKeyDown(Input.KEY_RIGHT)) {
+				
+				if (editorTimer < 50f && firstPress) editorTimer += 0.1f * delta;
+				
+				else if (editorTimer  < 5f && !firstPress) editorTimer += 0.1f * delta;
+					
+				else {
+					
+					if (gc.getInput().isKeyDown(Input.KEY_BACK)) backSpace();
+					else if (gc.getInput().isKeyDown(Input.KEY_UP)) cursorUp();
+					else if (gc.getInput().isKeyDown(Input.KEY_DOWN)) cursorDown();
+					else if (gc.getInput().isKeyDown(Input.KEY_LEFT)) cursorLeft();
+					else if (gc.getInput().isKeyDown(Input.KEY_RIGHT)) cursorRight();
+					
+					firstPress = false;
+					editorTimer = 0f;
+					
+				}
+				
+			} else if (!gc.getInput().isKeyDown(Input.KEY_BACK) && 
+					!gc.getInput().isKeyDown(Input.KEY_UP) && 
+					!gc.getInput().isKeyDown(Input.KEY_DOWN) && 
+					!gc.getInput().isKeyDown(Input.KEY_LEFT) && 
+					!gc.getInput().isKeyDown(Input.KEY_RIGHT)) {
+				
+				firstPress = true;
+				editorTimer = 0f;
+			}
+		
 		}
 		
 	}
@@ -199,6 +230,18 @@ public class EditorPane {
 			if (cursorPosition > currentScript.get(currentLine).length()) cursorPosition = currentScript.get(currentLine).length();
 			
 		}
+		
+	}
+
+	public GameObject getTarget() {
+		
+		return this.object;
+		
+	}
+
+	public void close() {
+		
+		this.closing = true;
 		
 	}
 
