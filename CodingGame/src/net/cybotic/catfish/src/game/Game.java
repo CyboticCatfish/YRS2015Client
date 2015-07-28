@@ -118,5 +118,11 @@ public class Game extends BasicGameState {
 		this.objects.remove(object);
 		
 	}
+
+	public List<GameObject> getGameObjects() {
+		
+		return this.objects;
+	
+	}
 	
 }

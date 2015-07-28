@@ -14,10 +14,10 @@ public abstract class GameObject {
 	private float renderingX, renderingY;
 	private boolean moving = false, canPerformActions = false, scriptRunning = false, scriptable = false;
 	private ScriptEnv scriptEnv;
-	private String script;
+	private String script, name;
 	Game game;
 	
-	public GameObject(int x, int y, int dir, String script, boolean scriptable, boolean canPerformActions, Game game) {
+	public GameObject(int x, int y, int dir, String script, boolean scriptable, boolean canPerformActions, Game game, String name) {
 		
 		this.scriptEnv = new ScriptEnv(this);
 		this.x = x;
@@ -29,6 +29,7 @@ public abstract class GameObject {
 		this.script = script;
 		this.game = game;
 		this.scriptable = scriptable;
+		this.name = name;
 		
 	}
 	
@@ -157,6 +158,36 @@ public abstract class GameObject {
 	public boolean isScriptRunning() {
 	
 		return scriptRunning;
+		
+	}
+
+	public int getX() {
+		
+		return this.x;
+		
+	}
+	
+	public int getY() {
+		
+		return this.y;
+		
+	}
+	
+	public Game getGame() {
+		
+		return this.game;
+		
+	}
+
+	public int getDir() {
+		
+		return this.dir;
+		
+	}
+	
+	public String getName() {
+		
+		return name;
 		
 	}
 	

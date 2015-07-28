@@ -51,20 +51,11 @@ public class EditorPane {
 	
 	public void appendCharacter(char character) {
 		
-		if (currentScript.get(currentLine).length() < 29) {
-		
-			String start = currentScript.get(currentLine).substring(0, cursorPosition);
-			String end = currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length());
+		String start = currentScript.get(currentLine).substring(0, cursorPosition);
+		String end = currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length());
 			
-			currentScript.set(currentLine, start + character + end);
-			cursorPosition += 1;
-		
-		} else {
-			
-			this.newLine();
-			this.appendCharacter(character);
-			
-		}
+		currentScript.set(currentLine, start + character + end);
+		cursorPosition += 1;
 		
 	}
 	
@@ -173,6 +164,13 @@ public class EditorPane {
 				} else if (stop.isMouseOver() &&  object.isScriptRunning()) {
 					
 					this.getTarget().getScriptEnv().interupt();
+					
+				} else {
+					
+					currentLine = (int) Math.floor(gc.getInput().getAbsoluteMouseY() / 13f);
+					if (currentLine > this.currentScript.size() - 1) currentLine = currentScript.size() - 1;
+					cursorPosition = (int) Math.floor((gc.getInput().getAbsoluteMouseX() - gc.getWidth() + 200)/ 6.5f);
+					if (cursorPosition > this.currentScript.get(currentLine).length()) cursorPosition = currentScript.get(currentLine).length();
 					
 				}
 				

@@ -10,7 +10,7 @@ public class Test extends GameObject {
 
 	public Test(Game game) {
 		
-		super(3, 3, 0, "object.moveForward();\nobject.turnClockwise();\nobject.moveForward();", true, true, game);
+		super(3, 3, 0, "object.moveForward();\nobject.turnClockwise();\nobject.moveForward();", true, true, game, "test");
 		
 	}
 

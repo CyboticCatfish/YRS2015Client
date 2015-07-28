@@ -1,12 +1,8 @@
->> Make in game text editor for editing scripts ----> Done but need to add proper GUI and link to game objects
 Make a font for in game and menus
 Design the main character
 Design the XML format for the levels (and how they are loaded)
- >> Implement in game objects
 Make tiles for in levels
-Setup static methods for HTTP requests
 Implement scoring algorithms
- >> Make objects run scripts
 Do a bunch of GUI buttons
 Do all of the various other art stuff
 Build some default levels (10???)
