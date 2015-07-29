@@ -1,7 +1,6 @@
-Implement scoring algorithms
 Make a bunch of objects
-Level editor?
 Make levels completable 
+Implement scoring algorithms
 
 Screens
 
@@ -9,4 +8,3 @@ Login screen
 Main menu (inc level select)
 Pause menu
 Score screen
-Loading?
