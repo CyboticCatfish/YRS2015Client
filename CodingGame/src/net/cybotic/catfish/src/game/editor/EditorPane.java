@@ -18,7 +18,7 @@ import org.newdawn.slick.gui.MouseOverArea;
 public class EditorPane {
 	
 	private List<String> currentScript = new ArrayList<String>();
-	private float editorTimer = 0f, flash = 0f, x = 0f;
+	private float editorTimer = 0f, flash = 0f, x = 0f, targetWidth = 200f;
 	private int cursorPosition = 0, currentLine = 0;
 	private boolean firstPress = true, cursorShow = false, closing = false;
 	private Game game;
@@ -39,7 +39,7 @@ public class EditorPane {
 			start.setMouseOverImage(buttons.getSubImage(1, 0));
 			start.setMouseDownImage(buttons.getSubImage(2, 0));
 			
-		exit = new MouseOverArea(gc, buttons.getSubImage(0, 1), gc.getWidth() - 190, gc.getHeight() - 40);
+		exit = new MouseOverArea(gc, buttons.getSubImage(0, 1), (int) Math.ceil(gc.getWidth() - (targetWidth - 10)), gc.getHeight() - 40);
 			exit.setMouseOverImage(buttons.getSubImage(1, 1));
 			exit.setMouseDownImage(buttons.getSubImage(2, 1));
 			
@@ -100,10 +100,10 @@ public class EditorPane {
 	public void render(GameContainer gc, Graphics g) {
 		
 		g.setColor(new Color(60, 60 , 60));
-		g.fillRect(gc.getWidth() - x,  0, 200, gc.getHeight());
+		g.fillRect(gc.getWidth() - x,  0, targetWidth, gc.getHeight());
 		
 		g.setColor(new Color(0, 0 , 0, 70));
-		g.fillRect(gc.getWidth() - x, 3 + 13 * currentLine, 200, 13);
+		g.fillRect(gc.getWidth() - x, 3 + 13 * currentLine, targetWidth, 13);
 		
 		g.setColor(new Color(0, 0 , 0, 51));
 		g.fillRect(gc.getWidth() - x,  0, 6, gc.getHeight());
@@ -113,7 +113,7 @@ public class EditorPane {
 		for (int i = 0; i < currentScript.size(); i++) g.drawString(currentScript.get(i), gc.getWidth() - x + 8, 3 + i * 13);
 		if (cursorShow) g.drawLine(gc.getWidth() - x + 8 + cursorPosition * 6.55f, 3 + currentLine * 13f, gc.getWidth() - x + 8 + cursorPosition * 6.55f, 15 + currentLine * 13f);
 		
-		g.translate(- x + 200, 0);
+		g.translate(- x + targetWidth, 0);
 		
 		start.render(gc, g);
 		exit.render(gc, g);
@@ -133,23 +133,17 @@ public class EditorPane {
 		
 		
 	}
-	
-	public void done() {
-		
-		
-		
-	}
 
 	public void update(GameContainer gc, int delta) {
 		
-		if (x < 200f && this.game.isEditorOpen()) x += 1f * delta;
-		else if (x > 200f && this.game.isEditorOpen()) x = 200f;
+		if (x < targetWidth && this.game.isEditorOpen()) x += 1f * delta;
+		else if (x > targetWidth && this.game.isEditorOpen()) x = targetWidth;
 		else if (x >= 0f && !this.game.isEditorOpen()) x -= 1f * delta;
 		
 		if (closing) game.closeEditor(gc);
 		else {
 			
-			if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+			if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON) && gc.getInput().getAbsoluteMouseX() > gc.getWidth() - targetWidth + 6) {
 				
 				if (start.isMouseOver()) {
 					
@@ -169,8 +163,9 @@ public class EditorPane {
 					
 					currentLine = (int) Math.floor(gc.getInput().getAbsoluteMouseY() / 13f);
 					if (currentLine > this.currentScript.size() - 1) currentLine = currentScript.size() - 1;
-					cursorPosition = (int) Math.floor((gc.getInput().getAbsoluteMouseX() - gc.getWidth() + 200)/ 6.5f);
+					cursorPosition = (int) Math.floor((gc.getInput().getAbsoluteMouseX() - gc.getWidth() + targetWidth)/ 6.5f);
 					if (cursorPosition > this.currentScript.get(currentLine).length()) cursorPosition = currentScript.get(currentLine).length();
+					else if (cursorPosition < 0) cursorPosition = 0;
 					
 				}
 				
@@ -299,6 +294,28 @@ public class EditorPane {
 	public void close() {
 		
 		this.closing = true;
+		
+	}
+
+	public float getTargetWidth() {
+		
+		return this.targetWidth;
+		
+	}
+	
+	public void resizeBy(int width, GameContainer gc) {
+		
+		this.x += width;
+		this.targetWidth += width;
+		
+		if (targetWidth < 126) {
+			
+			x = 126;
+			targetWidth = 126;
+			
+		}
+		
+		exit.setX((int) Math.ceil(gc.getWidth() - (targetWidth - 10)));
 		
 	}
 

@@ -1,17 +1,24 @@
 package net.cybotic.catfish.src;
 
-import net.cybotic.catfish.src.game.Game;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.state.StateBasedGame;
 
 public class Main extends StateBasedGame {
 	
 	public static int WIDTH = 800, HEIGHT = 600;
+	public static String LOGIN_TOKEN;
 	public static boolean FULLSCREEN = false;
+	public static SpriteSheet CURSOR_IMAGES;
+	public static boolean MUST_LOGIN = true;
 	
 	public Main() {
 		
@@ -21,10 +28,34 @@ public class Main extends StateBasedGame {
 	
 	public static void main(String args[]) throws SlickException {
 		
-		//TODO add load screen dimennsions from config
+		File f = new File("config.data");
+		
+		if (f.exists()) {
+			
+			try {
+				
+				BufferedReader br = new BufferedReader(new FileReader(f));
+				
+				WIDTH = Integer.parseInt(br.readLine());
+				HEIGHT = Integer.parseInt(br.readLine());
+				LOGIN_TOKEN = br.readLine();
+				
+				MUST_LOGIN = false;
+				
+				br.close();
+				
+			} catch (NumberFormatException | IOException e) {
+				
+				f.delete();
+				
+			}
+			
+		}
 		
 		AppGameContainer app = new AppGameContainer(new Main());
 		app.setDisplayMode(Main.WIDTH, Main.HEIGHT, Main.FULLSCREEN);
+		app.setAlwaysRender(true);
+		app.setShowFPS(false);
 		app.start();
 		
 	}
@@ -32,7 +63,18 @@ public class Main extends StateBasedGame {
 	@Override
 	public void initStatesList(GameContainer gc) throws SlickException {
 		
-		this.addState(new Game());
+		CURSOR_IMAGES = new SpriteSheet(new Image("res/cursors.png"), 16, 16);
+		gc.setMouseCursor(CURSOR_IMAGES.getSprite(2, 0), 0, 0);
+		
+		/**
+		
+			HttpRequest request = HttpRequest.get("https://dev.mrmindimplosion.co.uk:5000/level/get?id=3");
+			request.trustAllCerts();
+			request.trustAllHosts();
+		
+		**/
+		
+		this.addState(new CyboticCatfish());
 		this.enterState(0);
 		
 	}

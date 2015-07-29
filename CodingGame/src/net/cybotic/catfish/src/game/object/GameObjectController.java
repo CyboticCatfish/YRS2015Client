@@ -109,7 +109,6 @@ public class GameObjectController {
 	
 	public boolean objectToFront() {
 		
-		
 		for (GameObject object : target.getGame().getGameObjects()) {
 			
 			if (this.target.getDir() == 0) {

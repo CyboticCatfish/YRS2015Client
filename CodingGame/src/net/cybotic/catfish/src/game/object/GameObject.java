@@ -5,31 +5,30 @@ import net.cybotic.catfish.src.script.ScriptEnv;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 public abstract class GameObject {
 	
-	private int x, y, dir;
+	private int x, y, z = 0, dir;
 	private float renderingX, renderingY;
-	private boolean moving = false, canPerformActions = false, scriptRunning = false, scriptable = false;
+	private boolean moving = false, scriptRunning = false, scriptable = false, collidable = false;
 	private ScriptEnv scriptEnv;
 	private String script, name;
 	Game game;
 	
-	public GameObject(int x, int y, int dir, String script, boolean scriptable, boolean canPerformActions, Game game, String name) {
+	public GameObject(int x, int y, int z, int dir, String script, boolean scriptable, Game game, String name, boolean collidable) {
 		
 		this.scriptEnv = new ScriptEnv(this);
 		this.x = x;
 		this.y = y;
-		this.renderingX = x * 64;
-		this.renderingY = y * 64;
+		this.renderingX = x * 48;
+		this.renderingY = y * 48;
 		this.dir = dir;
-		this.canPerformActions = canPerformActions;
 		this.script = script;
 		this.game = game;
 		this.scriptable = scriptable;
 		this.name = name;
+		this.collidable =collidable;
 		
 	}
 	
@@ -38,24 +37,16 @@ public abstract class GameObject {
 	
 	public void preUpdate(GameContainer gc, int delta) throws SlickException {
 		
-		if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON) && this.scriptable && !game.isEditorOpen()
-				&& gc.getInput().getAbsoluteMouseX() < this.getRenderingX() + 64 && gc.getInput().getAbsoluteMouseX() > this.getRenderingX()
-				&& gc.getInput().getAbsoluteMouseY() < this.getRenderingY() + 64 && gc.getInput().getAbsoluteMouseY() > this.getRenderingY()) {
+		if (this.moving && this.scriptable) {
 			
-			this.game.openEditor(this, gc);
-			
-		}
-		
-		if (this.moving && this.canPerformActions) {
-			
-			if (renderingY < y * 64 && dir == 2) renderingY += 0.1f * delta;
-			else if (renderingX > x * 64 && dir == 3) renderingX -= 0.1f * delta;
-			else if (renderingY > y * 64 && dir == 0) renderingY -= 0.1f * delta;
-			else if (renderingX < x * 64 && dir == 1) renderingX += 0.1f * delta;
+			if (renderingY < y * 48 && dir == 2) renderingY += 0.1f * delta;
+			else if (renderingX > x * 48 && dir == 3) renderingX -= 0.1f * delta;
+			else if (renderingY > y * 48 && dir == 0) renderingY -= 0.1f * delta;
+			else if (renderingX < x * 48 && dir == 1) renderingX += 0.1f * delta;
 			else {
 				
-				this.renderingX = x * 64;
-				this.renderingY = y * 64;
+				this.renderingX = x * 48;
+				this.renderingY = y * 48;
 				
 				moving = false;
 				
@@ -115,14 +106,31 @@ public abstract class GameObject {
 		
 		moving = true;
 				
-		if (dir == 0) y -= 1;
-		else if (dir == 1) x += 1;
-		else if (dir == 2) y += 1;
-		else if (dir == 3) x -= 1;
-		
-		
+		if (dir == 0) {
+			
+			if (y > 0 && !collidableObjectToFront()) y -= 1;
+			
+		} else if (dir == 1) {
+			
+			if (x < game.getWidth() - 1 && !collidableObjectToFront()) x += 1;
+			
+		} else if (dir == 2) {
+			
+			if (y < game.getHeight() - 1 && !collidableObjectToFront()) y += 1;
+			
+		} else if (dir == 3) {
+			
+			if (x > 0 && !collidableObjectToFront()) x -= 1;
+			
+		} else moving = false;
 	}
 	
+	private boolean collidableObjectToFront() {
+		
+		return false;
+		
+	}
+
 	public void turnClockwise() {
 		
 		dir += 1;
@@ -188,6 +196,24 @@ public abstract class GameObject {
 	public String getName() {
 		
 		return name;
+		
+	}
+
+	public boolean isScriptable() {
+		
+		return this.scriptable;
+		
+	}
+	
+	public boolean isCollidable() {
+		
+		return this.collidable;
+		
+	}
+
+	public int getZ() {
+		
+		return this.z;
 		
 	}
 	
