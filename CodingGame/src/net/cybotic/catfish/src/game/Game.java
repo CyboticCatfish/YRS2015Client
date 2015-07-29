@@ -25,22 +25,65 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.xml.sax.SAXException;
 
+import com.github.kevinsawicki.http.HttpRequest;
+import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
+
 public class Game extends BasicGameState {
 	
-	private boolean editorOpen = false;
+	private boolean editorOpen = false, loading = true, init = false, error = false;
 	private EditorPane currentEditor;
 	public static UnicodeFont FONT;
 	private List<GameObject> objects;
 	private int cursorMode = 1;
 	private float translateX = 0f, translateY = 0f, lastMouseX, lastMouseY;
 	private Level level;
-	private int width, height;
+	private int width, height, id = 0;
 	private SpriteSheet tiles;
-	private String XML;
 	
-	public Game(String XML) {
+	public class LevelLoadThread implements Runnable {
+		
+		private int id;
+		private Game game;
+		
+		public LevelLoadThread(int id, Game game) {
+			
+			this.id = id;
+			this.game = game;
+			
+		}
 
-		this.XML = XML;
+		@Override
+		public void run() {
+			
+			try {
+				
+				HttpRequest request = HttpRequest.get("https://dev.mrmindimplosion.co.uk:5000/level/get?id=" + id);
+				request.trustAllCerts();
+				request.trustAllHosts();
+				
+				objects = new ArrayList<GameObject>();
+				
+				level = new Level(request.body(), game);
+				objects = new ArrayList<GameObject>(level.getObjects());
+				width = level.getWidth();
+				height = level.getHeight();
+				
+				loading = false;
+				
+			} catch (HttpRequestException | ParserConfigurationException
+					| SAXException | IOException | SlickException e) {
+				
+				error = true;
+				
+			}
+			
+		}
+		
+	}
+	
+	public Game(int id) {
+
+		this.id = id;
 		
 	}
 	
@@ -49,48 +92,21 @@ public class Game extends BasicGameState {
 	public void init(GameContainer gc, StateBasedGame sbg)
 			throws SlickException {
 		
+		lastMouseX = gc.getInput().getAbsoluteMouseX();
+		lastMouseY = gc.getInput().getAbsoluteMouseY();
 		
-		try {
-
-			objects = new ArrayList<GameObject>();
-			this.level = new Level(XML, this);
-			
-			objects = new ArrayList<GameObject>(level.getObjects());
-			this.width = level.getWidth();
-			this.height = level.getHeight();
-			
-			lastMouseX = gc.getInput().getAbsoluteMouseX();
-			lastMouseY = gc.getInput().getAbsoluteMouseY();
-			
-			gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 16, 16);
-			
-			FONT = new UnicodeFont("res/Anonymous_Pro.ttf", 12, false, false);
-
-			FONT.addAsciiGlyphs();
-			FONT.getEffects().add(new ColorEffect());
-			FONT.loadGlyphs();
+		gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 16, 16);
 		
-			EditorKeyListener listener = new EditorKeyListener(this);
-			gc.getInput().addKeyListener(listener);
-			
-			tiles = new SpriteSheet(Main.loadImage("res/tiles2.png"), 32, 32);
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-			gc.exit();
-			
-		} catch (SAXException e) {
-			
-			e.printStackTrace();
-			gc.exit();
-			
-		} catch (ParserConfigurationException e) {
-			
-			e.printStackTrace();
-			gc.exit();
-			
-		}
+		FONT = new UnicodeFont("res/Anonymous_Pro.ttf", 12, false, false);
+
+		FONT.addAsciiGlyphs();
+		FONT.getEffects().add(new ColorEffect());
+		FONT.loadGlyphs();
+	
+		EditorKeyListener listener = new EditorKeyListener(this);
+		gc.getInput().addKeyListener(listener);
+		
+		tiles = new SpriteSheet(Main.loadImage("res/tiles2.png"), 32, 32);
 		
 		
 	}
@@ -101,75 +117,84 @@ public class Game extends BasicGameState {
 		
 		g.setBackground(new Color(95, 95, 87));
 		
-		if (!g.getFont().equals(FONT)) g.setFont(FONT);
+		if (!loading) {
 		
-		g.translate((int) Math.ceil(translateX), (int) Math.ceil(translateY));
-		
-		for (int i = 0; i < width; i++) {
+			if (!g.getFont().equals(FONT)) g.setFont(FONT);
 			
-			g.drawImage(tiles.getSprite(2, 0), i * 32, - 32);
-			g.drawImage(tiles.getSprite(2, 2), i * 32, height * 32);
+			g.translate((int) Math.ceil(translateX), (int) Math.ceil(translateY));
 			
-		}
-		
-		for (int i = 0; i < height; i++) {
-			
-			g.drawImage(tiles.getSprite(1, 1), - 32, i * 32);
-			g.drawImage(tiles.getSprite(3, 1), width * 32, i * 32);
-			
-		}
-		
-		g.drawImage(tiles.getSprite(1, 0), - 32, - 32);
-		g.drawImage(tiles.getSprite(1, 2), - 32, height * 32);
-		g.drawImage(tiles.getSprite(3, 0), width * 32, - 32);
-		g.drawImage(tiles.getSprite(3, 2), width * 32, height * 32);
-		
-		for (int i = 0; i < width; i++) {
-			
-			for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
 				
-				g.drawImage(tiles.getSprite(2, 1), i * 32, j * 32);
+				g.drawImage(tiles.getSprite(2, 0), i * 32, - 32);
+				g.drawImage(tiles.getSprite(2, 2), i * 32, height * 32);
 				
 			}
 			
-		}
-		
-		for (int x = 0; x < this.getWidth(); x++) {
-		
-			for (int y = 0; y < this.getHeight(); y++) {
+			for (int i = 0; i < height; i++) {
 				
-				List<GameObject> tempObjects = new ArrayList<GameObject>();
+				g.drawImage(tiles.getSprite(1, 1), - 32, i * 32);
+				g.drawImage(tiles.getSprite(3, 1), width * 32, i * 32);
 				
-				for (GameObject object : objects) {
-					
-					if (object.getX() == x && object.getY() == y) tempObjects.add(object);
-					
-				}
-				
-				Collections.sort(tempObjects, new Comparator<GameObject>() {
-					
-			        @Override
-			        public int compare(GameObject object1, GameObject object2) {
-			        	
-			            return  object1.getZ() - object2.getZ();
-			            
-			        }
-			        
-			    });
-				
-				for (GameObject object : tempObjects) {
-					
-					object.render(gc, g);
-					
-				}
-		
 			}
+			
+			g.drawImage(tiles.getSprite(1, 0), - 32, - 32);
+			g.drawImage(tiles.getSprite(1, 2), - 32, height * 32);
+			g.drawImage(tiles.getSprite(3, 0), width * 32, - 32);
+			g.drawImage(tiles.getSprite(3, 2), width * 32, height * 32);
+			
+			for (int i = 0; i < width; i++) {
+				
+				for (int j = 0; j < height; j++) {
+					
+					g.drawImage(tiles.getSprite(2, 1), i * 32, j * 32);
+					
+				}
+				
+			}
+			
+			for (int x = 0; x < this.getWidth(); x++) {
+			
+				for (int y = 0; y < this.getHeight(); y++) {
+					
+					List<GameObject> tempObjects = new ArrayList<GameObject>();
+					
+					for (GameObject object : objects) {
+						
+						if (object.getX() == x && object.getY() == y) tempObjects.add(object);
+						
+					}
+					
+					Collections.sort(tempObjects, new Comparator<GameObject>() {
+						
+				        @Override
+				        public int compare(GameObject object1, GameObject object2) {
+				        	
+				            return  object1.getZ() - object2.getZ();
+				            
+				        }
+				        
+				    });
+					
+					for (GameObject object : tempObjects) {
+						
+						object.render(gc, g);
+						
+					}
+			
+				}
+			
+			}
+			
+			g.resetTransform();
+			
+			if (this.currentEditor != null) currentEditor.render(gc, g);
 		
+		} else {
+			
+			if (!error) Main.GAME_FONT.drawString(gc.getWidth() / 2 - 10 * 11, gc.getHeight() / 2 - 8, "LOADING...");
+			else Main.GAME_FONT.drawString(gc.getWidth() / 2 - 20 * 10, gc.getHeight() / 2 - 8, "SERVER TIMED OUT! :(");
+			
 		}
-		
-		g.resetTransform();
-		
-		if (this.currentEditor != null) currentEditor.render(gc, g);
 		
 	}
 
@@ -177,77 +202,86 @@ public class Game extends BasicGameState {
 	public void update(GameContainer gc, StateBasedGame sbg, int delta)
 			throws SlickException {
 		
-		if (this.currentEditor != null) currentEditor.update(gc, delta);
+		if (!loading) {
 		
-		boolean cursorChange = false;
-		
-		if (!this.editorOpen) {
-		
-			for (GameObject object : objects) {
+			if (this.currentEditor != null) currentEditor.update(gc, delta);
+			
+			boolean cursorChange = false;
+			
+			if (!this.editorOpen) {
+			
+				for (GameObject object : objects) {
+					
+					if (gc.getInput().getAbsoluteMouseX() < object.getRenderingX() + 32 + translateX && gc.getInput().getAbsoluteMouseX() > object.getRenderingX() + translateX
+						&& gc.getInput().getAbsoluteMouseY() < object.getRenderingY() + 32 + translateY && gc.getInput().getAbsoluteMouseY() > object.getRenderingY() + translateY
+						&& object.isScriptable()) {
+						
+						if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) this.openEditor(object, gc);
+						
+						cursorChange = true;
+						if (cursorMode != 2) gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(0, 0), 0, 0);
+						cursorMode = 2;
+						break;
+						
+					}
+					
+				}
 				
-				if (gc.getInput().getAbsoluteMouseX() < object.getRenderingX() + 32 + translateX && gc.getInput().getAbsoluteMouseX() > object.getRenderingX() + translateX
-					&& gc.getInput().getAbsoluteMouseY() < object.getRenderingY() + 32 + translateY && gc.getInput().getAbsoluteMouseY() > object.getRenderingY() + translateY
-					&& object.isScriptable()) {
+				if (!cursorChange && cursorMode != 1) {
 					
-					if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) this.openEditor(object, gc);
+					gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 16, 16);
+					cursorMode = 1;
 					
-					cursorChange = true;
-					if (cursorMode != 2) gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(0, 0), 0, 0);
+				}
+			
+			} else {
+				
+				if (cursorMode != 2 && gc.getInput().getAbsoluteMouseX() > gc.getWidth() - currentEditor.getTargetWidth() + 10) {
+					
+					gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(2, 0), 0, 0);
 					cursorMode = 2;
-					break;
+					
+				} else if (cursorMode != 3 && gc.getInput().getAbsoluteMouseX() < gc.getWidth() - currentEditor.getTargetWidth() + 10
+						 && gc.getInput().getAbsoluteMouseX() > gc.getWidth() - currentEditor.getTargetWidth() - 10) {
+					
+					gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(3, 0), 16, 16);
+					cursorMode = 3;
+					
+				} else if (cursorMode != 1 && gc.getInput().getAbsoluteMouseX() < gc.getWidth() - currentEditor.getTargetWidth() - 10) {
+					
+					gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 16, 16);
+					cursorMode = 1;
 					
 				}
 				
 			}
 			
-			if (!cursorChange && cursorMode != 1) {
+			for (GameObject object : objects) {
 				
-				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 16, 16);
-				cursorMode = 1;
-				
-			}
-		
-		} else {
-			
-			if (cursorMode != 2 && gc.getInput().getAbsoluteMouseX() > gc.getWidth() - currentEditor.getTargetWidth() + 10) {
-				
-				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(2, 0), 0, 0);
-				cursorMode = 2;
-				
-			} else if (cursorMode != 3 && gc.getInput().getAbsoluteMouseX() < gc.getWidth() - currentEditor.getTargetWidth() + 10
-					 && gc.getInput().getAbsoluteMouseX() > gc.getWidth() - currentEditor.getTargetWidth() - 10) {
-				
-				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(3, 0), 16, 16);
-				cursorMode = 3;
-				
-			} else if (cursorMode != 1 && gc.getInput().getAbsoluteMouseX() < gc.getWidth() - currentEditor.getTargetWidth() - 10) {
-				
-				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 16, 16);
-				cursorMode = 1;
+				object.preUpdate(gc, delta);
 				
 			}
 			
-		}
+			if (gc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && cursorMode == 1) {
+				
+				this.translateX += gc.getInput().getAbsoluteMouseX() - lastMouseX;
+				this.translateY += gc.getInput().getAbsoluteMouseY() - lastMouseY;
+				
+			} else if (gc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && cursorMode == 3) {
+				
+				this.currentEditor.resizeBy(-(int) Math.ceil(gc.getInput().getAbsoluteMouseX() - lastMouseX), gc);
+				
+			}
+			
+			lastMouseX = gc.getInput().getAbsoluteMouseX();
+			lastMouseY = gc.getInput().getAbsoluteMouseY();
 		
-		for (GameObject object : objects) {
+		} else if (!init) {
 			
-			object.preUpdate(gc, delta);
-			
-		}
-		
-		if (gc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && cursorMode == 1) {
-			
-			this.translateX += gc.getInput().getAbsoluteMouseX() - lastMouseX;
-			this.translateY += gc.getInput().getAbsoluteMouseY() - lastMouseY;
-			
-		} else if (gc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && cursorMode == 3) {
-			
-			this.currentEditor.resizeBy(-(int) Math.ceil(gc.getInput().getAbsoluteMouseX() - lastMouseX), gc);
+			(new Thread(new LevelLoadThread(id, this))).run();
+			init = true;
 			
 		}
-		
-		lastMouseX = gc.getInput().getAbsoluteMouseX();
-		lastMouseY = gc.getInput().getAbsoluteMouseY();
 		
 	}
 

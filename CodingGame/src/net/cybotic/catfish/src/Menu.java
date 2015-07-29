@@ -34,14 +34,10 @@ public class Menu extends BasicGameState {
 		
 		if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
 			
-			HttpRequest request = HttpRequest.get("https://dev.mrmindimplosion.co.uk:5000/level/get?id=3");
-			request.trustAllCerts();
-			request.trustAllHosts();
-			
-			Game game = new Game(request.body());
+			Game game = new Game(3);
 			sbg.addState(game);
-			game.init(gc, sbg);
 			sbg.enterState(3, new FadeOutTransition(), new FadeInTransition());
+			game.init(gc, sbg);
 			
 		}
 		
