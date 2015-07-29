@@ -51,7 +51,7 @@ public class Level {
 			if (eElement.hasAttribute("typeid")) {
 				
 				int id = Integer.parseInt(eElement.getAttribute("typeid"));
-				int x = 0, y = 0, z = 0, dir = 2;
+				int x = 0, y = 0, z = 0, dir = 2, listenerLevel = 0;
 				boolean scriptable = false, collidable = true;
 				String script = eElement.getTextContent();
 				
@@ -64,10 +64,11 @@ public class Level {
 				while (dir > 3) dir -= 4;
 				if (eElement.hasAttribute("scriptable")) scriptable = Boolean.parseBoolean(eElement.getAttribute("scriptable"));
 				if (eElement.hasAttribute("collidable")) collidable = Boolean.parseBoolean(eElement.getAttribute("collidable"));
+				if (eElement.hasAttribute("listenerLevel")) listenerLevel = Integer.parseInt(eElement.getAttribute("listenerLevel"));
 				
 				if (id == 0) {
 					
-					this.objects.add(new Robot(x, y, z, dir, script, scriptable, game, "robot", collidable));
+					this.objects.add(new Robot(x, y, z, dir, script, scriptable, game, "robot", collidable, listenerLevel));
 					
 				}
 				

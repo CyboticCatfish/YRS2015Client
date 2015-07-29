@@ -107,7 +107,7 @@ public class GameObjectController {
 		
 	}
 	
-	public boolean objectToFront() {
+	public boolean detectFront() {
 		
 		for (GameObject object : target.getGame().getGameObjects()) {
 			
@@ -135,7 +135,7 @@ public class GameObjectController {
 		
 	}
 	
-	public boolean objectToBack() {
+	public boolean detectBack() {
 		
 		
 		for (GameObject object : target.getGame().getGameObjects()) {
@@ -164,7 +164,7 @@ public class GameObjectController {
 		
 	}
 	
-	public boolean objectToLeft() {
+	public boolean detectLeft() {
 		
 		
 		for (GameObject object : target.getGame().getGameObjects()) {
@@ -193,7 +193,7 @@ public class GameObjectController {
 		
 	}
 	
-	public boolean objectToRight() {
+	public boolean detectRight() {
 		
 		for (GameObject object : target.getGame().getGameObjects()) {
 			
@@ -223,7 +223,7 @@ public class GameObjectController {
 	
 	public String getObjectInFront() {
 		
-		if (objectToFront()) {
+		if (detectFront()) {
 			
 			for (GameObject object : target.getGame().getGameObjects()) {
 				

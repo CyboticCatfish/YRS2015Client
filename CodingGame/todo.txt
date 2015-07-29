@@ -5,7 +5,6 @@ Make levels completable
 
 Screens
 
-Org screen
 Login screen
 Main menu (inc level select)
 Pause menu

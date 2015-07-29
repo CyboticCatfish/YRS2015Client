@@ -10,6 +10,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.SpriteSheetFont;
 import org.newdawn.slick.state.StateBasedGame;
 
 public class Main extends StateBasedGame {
@@ -19,6 +20,7 @@ public class Main extends StateBasedGame {
 	public static boolean FULLSCREEN = false;
 	public static SpriteSheet CURSOR_IMAGES;
 	public static boolean MUST_LOGIN = true;
+	public static SpriteSheetFont GAME_FONT;
 	
 	public Main() {
 		
@@ -63,7 +65,8 @@ public class Main extends StateBasedGame {
 	@Override
 	public void initStatesList(GameContainer gc) throws SlickException {
 		
-		CURSOR_IMAGES = new SpriteSheet(new Image("res/cursors.png"), 16, 16);
+		GAME_FONT = new SpriteSheetFont(new SpriteSheet(Main.loadImage("res/font.png"), 16, 22), ' ');
+		CURSOR_IMAGES = new SpriteSheet(Main.loadImage("res/cursors.png"), 32, 32);
 		gc.setMouseCursor(CURSOR_IMAGES.getSprite(2, 0), 0, 0);
 		
 		/**
@@ -84,7 +87,7 @@ public class Main extends StateBasedGame {
 		Image temp = new Image(file);
 		temp.setFilter(Image.FILTER_NEAREST);
 		
-		return temp.getScaledCopy(3f);
+		return temp.getScaledCopy(2f);
 		
 	}
 	

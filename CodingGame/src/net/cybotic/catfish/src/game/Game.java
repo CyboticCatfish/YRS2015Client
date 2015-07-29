@@ -62,7 +62,7 @@ public class Game extends BasicGameState {
 			lastMouseX = gc.getInput().getAbsoluteMouseX();
 			lastMouseY = gc.getInput().getAbsoluteMouseY();
 			
-			gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 8, 8);
+			gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 16, 16);
 			
 			FONT = new UnicodeFont("res/Anonymous_Pro.ttf", 12, false, false);
 
@@ -73,7 +73,7 @@ public class Game extends BasicGameState {
 			EditorKeyListener listener = new EditorKeyListener(this);
 			gc.getInput().addKeyListener(listener);
 			
-			tiles = new SpriteSheet(Main.loadImage("res/tiles2.png"), 48, 48);
+			tiles = new SpriteSheet(Main.loadImage("res/tiles2.png"), 32, 32);
 			
 		} catch (IOException e) {
 			
@@ -107,28 +107,28 @@ public class Game extends BasicGameState {
 		
 		for (int i = 0; i < width; i++) {
 			
-			g.drawImage(tiles.getSprite(2, 0), i * 48, - 48);
-			g.drawImage(tiles.getSprite(2, 2), i * 48, height * 48);
+			g.drawImage(tiles.getSprite(2, 0), i * 32, - 32);
+			g.drawImage(tiles.getSprite(2, 2), i * 32, height * 32);
 			
 		}
 		
 		for (int i = 0; i < height; i++) {
 			
-			g.drawImage(tiles.getSprite(1, 1), - 48, i * 48);
-			g.drawImage(tiles.getSprite(3, 1), width * 48, i * 48);
+			g.drawImage(tiles.getSprite(1, 1), - 32, i * 32);
+			g.drawImage(tiles.getSprite(3, 1), width * 32, i * 32);
 			
 		}
 		
-		g.drawImage(tiles.getSprite(1, 0), - 48, - 48);
-		g.drawImage(tiles.getSprite(1, 2), - 48, height * 48);
-		g.drawImage(tiles.getSprite(3, 0), width * 48, - 48);
-		g.drawImage(tiles.getSprite(3, 2), width * 48, height * 48);
+		g.drawImage(tiles.getSprite(1, 0), - 32, - 32);
+		g.drawImage(tiles.getSprite(1, 2), - 32, height * 32);
+		g.drawImage(tiles.getSprite(3, 0), width * 32, - 32);
+		g.drawImage(tiles.getSprite(3, 2), width * 32, height * 32);
 		
 		for (int i = 0; i < width; i++) {
 			
 			for (int j = 0; j < height; j++) {
 				
-				g.drawImage(tiles.getSprite(2, 1), i * 48, j * 48);
+				g.drawImage(tiles.getSprite(2, 1), i * 32, j * 32);
 				
 			}
 			
@@ -185,8 +185,8 @@ public class Game extends BasicGameState {
 		
 			for (GameObject object : objects) {
 				
-				if (gc.getInput().getAbsoluteMouseX() < object.getRenderingX() + 48 + translateX && gc.getInput().getAbsoluteMouseX() > object.getRenderingX() + translateX
-					&& gc.getInput().getAbsoluteMouseY() < object.getRenderingY() + 48 + translateY && gc.getInput().getAbsoluteMouseY() > object.getRenderingY() + translateY
+				if (gc.getInput().getAbsoluteMouseX() < object.getRenderingX() + 32 + translateX && gc.getInput().getAbsoluteMouseX() > object.getRenderingX() + translateX
+					&& gc.getInput().getAbsoluteMouseY() < object.getRenderingY() + 32 + translateY && gc.getInput().getAbsoluteMouseY() > object.getRenderingY() + translateY
 					&& object.isScriptable()) {
 					
 					if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) this.openEditor(object, gc);
@@ -202,7 +202,7 @@ public class Game extends BasicGameState {
 			
 			if (!cursorChange && cursorMode != 1) {
 				
-				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 8, 8);
+				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 16, 16);
 				cursorMode = 1;
 				
 			}
@@ -217,12 +217,12 @@ public class Game extends BasicGameState {
 			} else if (cursorMode != 3 && gc.getInput().getAbsoluteMouseX() < gc.getWidth() - currentEditor.getTargetWidth() + 10
 					 && gc.getInput().getAbsoluteMouseX() > gc.getWidth() - currentEditor.getTargetWidth() - 10) {
 				
-				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(3, 0), 8, 8);
+				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(3, 0), 16, 16);
 				cursorMode = 3;
 				
 			} else if (cursorMode != 1 && gc.getInput().getAbsoluteMouseX() < gc.getWidth() - currentEditor.getTargetWidth() - 10) {
 				
-				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 8, 8);
+				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(1, 0), 16, 16);
 				cursorMode = 1;
 				
 			}
@@ -310,6 +310,16 @@ public class Game extends BasicGameState {
 	public int getWidth() {
 		
 		return this.width;
+		
+	}
+	
+	public void addTrigger(int triggerLevel) {
+		
+		for (GameObject object : objects) {
+			
+			if (object.getListenerLevel() == triggerLevel) object.trigger();
+			
+		}
 		
 	}
 	

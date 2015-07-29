@@ -33,17 +33,17 @@ public class EditorPane {
 		
 		this.game = game;
 		this.object = target;
-		this.buttons = new SpriteSheet(Main.loadImage("res/buttons.png"), 36, 36);
+		this.buttons = new SpriteSheet(Main.loadImage("res/buttons.png"), 24, 24);
 		
-		start = new MouseOverArea(gc, buttons.getSubImage(0, 0), gc.getWidth() - 40, gc.getHeight() - 40);
+		start = new MouseOverArea(gc, buttons.getSubImage(0, 0), gc.getWidth() - 32, gc.getHeight() - 32);
 			start.setMouseOverImage(buttons.getSubImage(1, 0));
 			start.setMouseDownImage(buttons.getSubImage(2, 0));
 			
-		exit = new MouseOverArea(gc, buttons.getSubImage(0, 1), (int) Math.ceil(gc.getWidth() - (targetWidth - 10)), gc.getHeight() - 40);
+		exit = new MouseOverArea(gc, buttons.getSubImage(0, 1), (int) Math.ceil(gc.getWidth() - (targetWidth - 10)), gc.getHeight() - 32);
 			exit.setMouseOverImage(buttons.getSubImage(1, 1));
 			exit.setMouseDownImage(buttons.getSubImage(2, 1));
 			
-		stop = new MouseOverArea(gc, buttons.getSubImage(0, 2), gc.getWidth() - 80, gc.getHeight() - 40);
+		stop = new MouseOverArea(gc, buttons.getSubImage(0, 2), gc.getWidth() - 72, gc.getHeight() - 32);
 			stop.setMouseOverImage(buttons.getSubImage(1, 2));
 			stop.setMouseDownImage(buttons.getSubImage(2, 2));
 

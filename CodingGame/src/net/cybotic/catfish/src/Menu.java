@@ -1,9 +1,9 @@
 package net.cybotic.catfish.src;
 
-import org.newdawn.slick.Color;
+import net.cybotic.catfish.src.game.Game;
+
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
@@ -11,16 +11,13 @@ import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeInTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 
-public class CyboticCatfish extends BasicGameState {
-	
-	private float cool = 0f;
-	private Image catfish;
+import com.github.kevinsawicki.http.HttpRequest;
+
+public class Menu extends BasicGameState {
 
 	@Override
 	public void init(GameContainer gc, StateBasedGame sbg)
 			throws SlickException {
-		
-		catfish = Main.loadImage("res/catfish.png");
 		
 	}
 
@@ -28,31 +25,23 @@ public class CyboticCatfish extends BasicGameState {
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g)
 			throws SlickException {
 		
-		g.setBackground(new Color(0, 26, 26));
-		g.drawImage(catfish, gc.getWidth() / 2 - catfish.getWidth() / 2, gc.getHeight() / 2 - catfish.getHeight() / 2);
-		
+		Main.GAME_FONT.drawString(30, 30, "CLICK TO START THE DEFAULT LEVEL");
 	}
 
 	@Override
 	public void update(GameContainer gc, StateBasedGame sbg, int delta)
 			throws SlickException {
 		
-		cool += delta;
-		
-		if (cool > 3000 | gc.getInput().isKeyPressed(Input.KEY_ESCAPE)) {
+		if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
 			
-			if (Main.MUST_LOGIN) {
-				
-				//TODO login screen redirect
-				
-			} else {
-				
-				Menu menu = new Menu();
-				sbg.addState(menu);
-				menu.init(gc, sbg);
-				sbg.enterState(2, new FadeOutTransition(), new FadeInTransition());
-				
-			}
+			HttpRequest request = HttpRequest.get("https://dev.mrmindimplosion.co.uk:5000/level/get?id=3");
+			request.trustAllCerts();
+			request.trustAllHosts();
+			
+			Game game = new Game(request.body());
+			sbg.addState(game);
+			game.init(gc, sbg);
+			sbg.enterState(3, new FadeOutTransition(), new FadeInTransition());
 			
 		}
 		
@@ -61,10 +50,8 @@ public class CyboticCatfish extends BasicGameState {
 	@Override
 	public int getID() {
 		
-		return 0;
+		return 2;
 		
 	}
-
-	
 	
 }

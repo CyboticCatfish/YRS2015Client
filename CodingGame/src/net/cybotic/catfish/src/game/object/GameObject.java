@@ -9,26 +9,27 @@ import org.newdawn.slick.SlickException;
 
 public abstract class GameObject {
 	
-	private int x, y, z = 0, dir;
+	private int x, y, z = 0, dir, listenerLevel = 0;
 	private float renderingX, renderingY;
 	private boolean moving = false, scriptRunning = false, scriptable = false, collidable = false;
 	private ScriptEnv scriptEnv;
 	private String script, name;
 	Game game;
 	
-	public GameObject(int x, int y, int z, int dir, String script, boolean scriptable, Game game, String name, boolean collidable) {
+	public GameObject(int x, int y, int z, int dir, String script, boolean scriptable, Game game, String name, boolean collidable, int listenerLevel) {
 		
 		this.scriptEnv = new ScriptEnv(this);
 		this.x = x;
 		this.y = y;
-		this.renderingX = x * 48;
-		this.renderingY = y * 48;
+		this.renderingX = x * 32;
+		this.renderingY = y * 32;
 		this.dir = dir;
 		this.script = script;
 		this.game = game;
 		this.scriptable = scriptable;
 		this.name = name;
 		this.collidable =collidable;
+		this.listenerLevel = listenerLevel;
 		
 	}
 	
@@ -39,14 +40,14 @@ public abstract class GameObject {
 		
 		if (this.moving && this.scriptable) {
 			
-			if (renderingY < y * 48 && dir == 2) renderingY += 0.1f * delta;
-			else if (renderingX > x * 48 && dir == 3) renderingX -= 0.1f * delta;
-			else if (renderingY > y * 48 && dir == 0) renderingY -= 0.1f * delta;
-			else if (renderingX < x * 48 && dir == 1) renderingX += 0.1f * delta;
+			if (renderingY < y * 32 && dir == 2) renderingY += 0.1f * delta;
+			else if (renderingX > x * 32 && dir == 3) renderingX -= 0.1f * delta;
+			else if (renderingY > y * 32 && dir == 0) renderingY -= 0.1f * delta;
+			else if (renderingX < x * 32 && dir == 1) renderingX += 0.1f * delta;
 			else {
 				
-				this.renderingX = x * 48;
-				this.renderingY = y * 48;
+				this.renderingX = x * 32;
+				this.renderingY = y * 32;
 				
 				moving = false;
 				
@@ -75,7 +76,6 @@ public abstract class GameObject {
 		
 	}
 	
-	public abstract void interactedWith(GameObject object);
 	public abstract int getObjectTypeID();
 
 	public String getScript() {
@@ -127,6 +127,15 @@ public abstract class GameObject {
 	
 	private boolean collidableObjectToFront() {
 		
+		for (GameObject object : game.getGameObjects()) {
+			
+			if (dir == 0 && object.getX() == this.getX() && object.collidable && object.getY() == this.getY() - 1) return true;
+			else if (dir == 1 && object.getX() == this.getX() + 1 && object.collidable && object.getY() == this.getY()) return true;
+			else if (dir == 2 && object.getX() == this.getX() && object.collidable && object.getY() == this.getY() + 1) return true;
+			else if (dir == 3 && object.getX() == this.getX() - 1 && object.collidable && object.getY() == this.getY()) return true;
+			
+		}
+		 
 		return false;
 		
 	}
@@ -142,12 +151,6 @@ public abstract class GameObject {
 		
 		dir -= 1;
 		if (dir < 0) dir = 3;
-		
-	}
-	
-	public void interact() {
-		
-		//TODO make interacted with execute on the nearest object
 		
 	}
 	
@@ -216,5 +219,13 @@ public abstract class GameObject {
 		return this.z;
 		
 	}
+	
+	public int getListenerLevel() {
+		
+		return this.listenerLevel;
+		
+	}
+	
+	public abstract void trigger();
 	
 }

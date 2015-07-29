@@ -13,11 +13,11 @@ public class Robot extends GameObject {
 	private SpriteSheet robot;
 
 	public Robot(int x, int y, int z, int dir, String script, boolean scriptable,
-			Game game, String name, boolean collidable) throws SlickException {
+			Game game, String name, boolean collidable, int listenerLevel) throws SlickException {
 		
-		super(x, y, z, dir, script, scriptable, game, name, collidable);
+		super(x, y, z, dir, script, scriptable, game, name, collidable, listenerLevel);
 		
-		robot = new SpriteSheet(Main.loadImage("res/robot.png"), 72, 72);
+		robot = new SpriteSheet(Main.loadImage("res/robot.png"), 48, 48);
 		
 	}
 
@@ -35,15 +35,16 @@ public class Robot extends GameObject {
 	}
 
 	@Override
-	public void interactedWith(GameObject object) {
+	public int getObjectTypeID() {
 		
+		return 0;
 		
 	}
 
 	@Override
-	public int getObjectTypeID() {
+	public void trigger() {
 		
-		return 0;
+		
 		
 	}
 	
