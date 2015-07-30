@@ -24,10 +24,15 @@ public class Level {
 	
 	private int width, height;
 	private List<GameObject> objects;
+	private String XML;
+	private Game game;
 	
 	public Level(String XML, Game game) throws ParserConfigurationException, SAXException, IOException, SlickException {
 		
 		objects = new ArrayList<GameObject>();
+		
+		this.XML = XML;
+		this.game = game;
 		
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -41,6 +46,21 @@ public class Level {
 		else this.width = 16;
 		if (rootElement.hasAttribute("height")) this.height = Integer.parseInt(rootElement.getAttribute("height"));
 		else this.height = 16;
+		
+		this.objects = this.getObjects();
+		
+	}
+	
+	public List<GameObject> getObjects() throws ParserConfigurationException, SAXException, IOException, SlickException {
+		
+		objects = new ArrayList<GameObject>();
+		
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		InputSource is = new InputSource(new StringReader(XML));
+		Document doc = dBuilder.parse(is);
+		
+		doc.getDocumentElement().normalize();
 		
 		NodeList nList = doc.getElementsByTagName("object");
 			
@@ -76,11 +96,7 @@ public class Level {
 			
 		}
 		
-	}
-	
-	public List<GameObject> getObjects() {
-		
-		return this.objects;
+		return new ArrayList<GameObject>(this.objects);
 		
 	}
 

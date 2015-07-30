@@ -1,8 +1,10 @@
 package net.cybotic.catfish.src;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.newdawn.slick.AppGameContainer;
@@ -20,7 +22,9 @@ public class Main extends StateBasedGame {
 	public static boolean FULLSCREEN = false;
 	public static SpriteSheet CURSOR_IMAGES;
 	public static boolean MUST_LOGIN = true;
-	public static SpriteSheetFont GAME_FONT;
+	public static SpriteSheetFont GAME_FONT, GAME_FONT_2;
+	public static String SERVER_URL = "http://c404.mrmindimplosion.co.uk:5000";
+	public static SpriteSheet USEFUL_BUTTONS, BIG_BUTTON;
 	
 	public Main() {
 		
@@ -66,18 +70,14 @@ public class Main extends StateBasedGame {
 	public void initStatesList(GameContainer gc) throws SlickException {
 		
 		GAME_FONT = new SpriteSheetFont(new SpriteSheet(Main.loadImage("res/font.png"), 16, 22), ' ');
+		GAME_FONT_2 = new SpriteSheetFont(new SpriteSheet(Main.loadImage("res/font2.png"), 16, 22), ' ');
 		CURSOR_IMAGES = new SpriteSheet(Main.loadImage("res/cursors.png"), 32, 32);
+		USEFUL_BUTTONS = new SpriteSheet(Main.loadImage("res/buttons2.png"), 32, 32);
+		BIG_BUTTON = new SpriteSheet(Main.loadImage("res/button.png"), 128, 32);
 		gc.setMouseCursor(CURSOR_IMAGES.getSprite(2, 0), 0, 0);
 		
-		/**
-		
-			HttpRequest request = HttpRequest.get("https://dev.mrmindimplosion.co.uk:5000/level/get?id=3");
-			request.trustAllCerts();
-			request.trustAllHosts();
-		
-		**/
-		
 		this.addState(new CyboticCatfish());
+		this.addState(new LoginScreen());
 		this.enterState(0);
 		
 	}
@@ -88,6 +88,18 @@ public class Main extends StateBasedGame {
 		temp.setFilter(Image.FILTER_NEAREST);
 		
 		return temp.getScaledCopy(2f);
+		
+	}
+
+	public static void writeConfig() throws IOException {
+		
+		BufferedWriter br = new BufferedWriter(new FileWriter(new File("config.data")));
+		
+		br.write(Main.WIDTH + "\n");
+		br.write(Main.HEIGHT + "\n");
+		br.write(Main.LOGIN_TOKEN);
+		
+		br.close();
 		
 	}
 	

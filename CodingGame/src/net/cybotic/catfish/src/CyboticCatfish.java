@@ -20,7 +20,10 @@ public class CyboticCatfish extends BasicGameState {
 	public void init(GameContainer gc, StateBasedGame sbg)
 			throws SlickException {
 		
-		catfish = Main.loadImage("res/catfish.png");
+		Image temp = new Image("res/catfish.png");
+		temp.setFilter(Image.FILTER_NEAREST);
+		
+		catfish = temp.getScaledCopy(3f);
 		
 	}
 
@@ -28,7 +31,7 @@ public class CyboticCatfish extends BasicGameState {
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g)
 			throws SlickException {
 		
-		g.setBackground(new Color(0, 26, 26));
+		g.setBackground(new Color(0, 60, 60));
 		g.drawImage(catfish, gc.getWidth() / 2 - catfish.getWidth() / 2, gc.getHeight() / 2 - catfish.getHeight() / 2);
 		
 	}
@@ -43,13 +46,15 @@ public class CyboticCatfish extends BasicGameState {
 			
 			if (Main.MUST_LOGIN) {
 				
-				//TODO login screen redirect
+				sbg.enterState(1, new FadeOutTransition(), new FadeInTransition());
+				
 				
 			} else {
 				
 				Menu menu = new Menu();
 				sbg.addState(menu);
 				menu.init(gc, sbg);
+				
 				sbg.enterState(2, new FadeOutTransition(), new FadeInTransition());
 				
 			}

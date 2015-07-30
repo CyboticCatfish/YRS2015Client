@@ -21,8 +21,11 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
+import org.newdawn.slick.gui.MouseOverArea;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.state.transition.FadeInTransition;
+import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.xml.sax.SAXException;
 
 import com.github.kevinsawicki.http.HttpRequest;
@@ -30,7 +33,7 @@ import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
 public class Game extends BasicGameState {
 	
-	private boolean editorOpen = false, loading = true, init = false, error = false;
+	private boolean editorOpen = false, loading = true, init = false, error = false, playing = false, paused = false;
 	private EditorPane currentEditor;
 	public static UnicodeFont FONT;
 	private List<GameObject> objects;
@@ -39,6 +42,8 @@ public class Game extends BasicGameState {
 	private Level level;
 	private int width, height, id = 0;
 	private SpriteSheet tiles;
+	private MouseOverArea play, stop, failed, pause, menu;
+	private boolean errorCursor = false;
 	
 	public class LevelLoadThread implements Runnable {
 		
@@ -57,9 +62,9 @@ public class Game extends BasicGameState {
 			
 			try {
 				
-				HttpRequest request = HttpRequest.get("https://dev.mrmindimplosion.co.uk:5000/level/get?id=" + id);
-				request.trustAllCerts();
-				request.trustAllHosts();
+				HttpRequest request = HttpRequest.get(Main.SERVER_URL + "/level/get?id=" + id);
+					request.trustAllCerts();
+					request.trustAllHosts();
 				
 				objects = new ArrayList<GameObject>();
 				
@@ -69,6 +74,9 @@ public class Game extends BasicGameState {
 				height = level.getHeight();
 				
 				loading = false;
+				
+				translateX = level.getWidth() * 24;
+				translateY = level.getHeight() * 16;
 				
 			} catch (HttpRequestException | ParserConfigurationException
 					| SAXException | IOException | SlickException e) {
@@ -106,8 +114,18 @@ public class Game extends BasicGameState {
 		EditorKeyListener listener = new EditorKeyListener(this);
 		gc.getInput().addKeyListener(listener);
 		
-		tiles = new SpriteSheet(Main.loadImage("res/tiles2.png"), 32, 32);
+		tiles = new SpriteSheet(Main.loadImage("res/tiles.png"), 32, 32);
 		
+		play = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 1), 4, gc.getHeight() - 40);
+			play.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 1));
+		stop = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 2), 44, gc.getHeight() - 40);
+			stop.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 2));
+		failed = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 3), gc.getWidth() / 2 - 16, gc.getHeight() / 2 + 40);
+			failed.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 3));
+		pause = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 0), 8, 8);
+			pause.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 0));
+		menu = new MouseOverArea(gc, Main.BIG_BUTTON.getSprite(0, 0), gc.getWidth() / 2 - 64, gc.getHeight() / 2 + 16);
+			menu.setMouseDownImage(Main.BIG_BUTTON.getSprite(0, 1));
 		
 	}
 
@@ -115,38 +133,54 @@ public class Game extends BasicGameState {
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g)
 			throws SlickException {
 		
-		g.setBackground(new Color(95, 95, 87));
+		g.setBackground(new Color(30, 36, 38));
 		
 		if (!loading) {
-		
+	
 			if (!g.getFont().equals(FONT)) g.setFont(FONT);
 			
 			g.translate((int) Math.ceil(translateX), (int) Math.ceil(translateY));
 			
 			for (int i = 0; i < width; i++) {
 				
-				g.drawImage(tiles.getSprite(2, 0), i * 32, - 32);
-				g.drawImage(tiles.getSprite(2, 2), i * 32, height * 32);
+				if (height % 2 == 0) {
+				
+					if (i % 2 == 0) g.drawImage(tiles.getSprite(2, 2), i * 32, height * 32);
+					else g.drawImage(tiles.getSprite(1, 2), i * 32, height * 32);
+				
+				} else {
+					
+					if (i % 2 == 0) g.drawImage(tiles.getSprite(1, 2), i * 32, height * 32);
+					else g.drawImage(tiles.getSprite(2, 2), i * 32, height * 32);
+					
+				}
 				
 			}
 			
 			for (int i = 0; i < height; i++) {
 				
-				g.drawImage(tiles.getSprite(1, 1), - 32, i * 32);
-				g.drawImage(tiles.getSprite(3, 1), width * 32, i * 32);
+				if (i % 2 == 0) g.drawImage(tiles.getSprite(0, 0), - 32, i * 32);
+				else g.drawImage(tiles.getSprite(0, 1), - 32, i * 32);
 				
 			}
 			
-			g.drawImage(tiles.getSprite(1, 0), - 32, - 32);
-			g.drawImage(tiles.getSprite(1, 2), - 32, height * 32);
-			g.drawImage(tiles.getSprite(3, 0), width * 32, - 32);
-			g.drawImage(tiles.getSprite(3, 2), width * 32, height * 32);
+			g.drawImage(tiles.getSprite(0, 2), - 32, height * 32);
 			
 			for (int i = 0; i < width; i++) {
 				
 				for (int j = 0; j < height; j++) {
 					
-					g.drawImage(tiles.getSprite(2, 1), i * 32, j * 32);
+					if (i % 2 == 0) {
+						
+						if (j % 2 == 0) g.drawImage(tiles.getSprite(2, 0), i * 32, j * 32);
+						else g.drawImage(tiles.getSprite(2, 1), i * 32, j * 32);
+					
+					} else {
+						
+						if (j % 2 == 0) g.drawImage(tiles.getSprite(2, 1), i * 32, j * 32);
+						else g.drawImage(tiles.getSprite(2, 0), i * 32, j * 32);
+						
+					}
 					
 				}
 				
@@ -187,28 +221,58 @@ public class Game extends BasicGameState {
 			
 			g.resetTransform();
 			
+			play.render(gc, g);
+			stop.render(gc, g);
+			
 			if (this.currentEditor != null) currentEditor.render(gc, g);
+			
+			if (paused) {
+				
+				g.setColor(new Color(0, 0, 0, 125));
+				g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
+				g.setColor(Color.white);
+				
+				menu.render(gc, g);
+				Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 4 * 9 + 4, gc.getHeight() / 2 + 20, "MENU");
+				Main.GAME_FONT.drawString(gc.getWidth() / 2 - 6 * 9 + 8, gc.getHeight() / 2 - 20, "PAUSED");
+				
+			}
+			
+			pause.render(gc, g);
 		
 		} else {
 			
-			if (!error) Main.GAME_FONT.drawString(gc.getWidth() / 2 - 10 * 11, gc.getHeight() / 2 - 8, "LOADING...");
-			else Main.GAME_FONT.drawString(gc.getWidth() / 2 - 20 * 10, gc.getHeight() / 2 - 8, "SERVER TIMED OUT! :(");
+			if (!error) Main.GAME_FONT.drawString(gc.getWidth() / 2 - 10 * 11 + 24, gc.getHeight() / 2 - 8, "LOADING...");
+			else {
+				
+				Main.GAME_FONT.drawString(gc.getWidth() / 2 - 14 * 10, gc.getHeight() / 2 - 8, "SERVER TIMED OUT!");
+				failed.render(gc, g);
+				
+			}
 			
 		}
-		
+				
 	}
 
 	@Override
 	public void update(GameContainer gc, StateBasedGame sbg, int delta)
 			throws SlickException {
 		
-		if (!loading) {
+		if (!loading && !paused) {
 		
 			if (this.currentEditor != null) currentEditor.update(gc, delta);
 			
 			boolean cursorChange = false;
 			
-			if (!this.editorOpen) {
+			if (play.isMouseOver() | stop.isMouseOver() | pause.isMouseOver()) {
+				
+				cursorChange = true;
+				if (cursorMode != 2) gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(2, 0), 0, 0);
+				cursorMode = 2;
+				
+			} 
+			
+			if (!this.editorOpen && !cursorChange) {
 			
 				for (GameObject object : objects) {
 					
@@ -219,8 +283,8 @@ public class Game extends BasicGameState {
 						if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) this.openEditor(object, gc);
 						
 						cursorChange = true;
-						if (cursorMode != 2) gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(0, 0), 0, 0);
-						cursorMode = 2;
+						if (cursorMode != 0) gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(0, 0), 0, 0);
+						cursorMode = 0;
 						break;
 						
 					}
@@ -234,7 +298,7 @@ public class Game extends BasicGameState {
 					
 				}
 			
-			} else {
+			} else if (editorOpen && !cursorChange) {
 				
 				if (cursorMode != 2 && gc.getInput().getAbsoluteMouseX() > gc.getWidth() - currentEditor.getTargetWidth() + 10) {
 					
@@ -262,16 +326,73 @@ public class Game extends BasicGameState {
 				
 			}
 			
-			if (gc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && cursorMode == 1) {
+			if (gc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && cursorMode == 1 && !play.isMouseOver() && !stop.isMouseOver()) {
 				
 				this.translateX += gc.getInput().getAbsoluteMouseX() - lastMouseX;
 				this.translateY += gc.getInput().getAbsoluteMouseY() - lastMouseY;
 				
-			} else if (gc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && cursorMode == 3) {
+			} else if (gc.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && cursorMode == 3 && !play.isMouseOver() && !stop.isMouseOver()) {
 				
 				this.currentEditor.resizeBy(-(int) Math.ceil(gc.getInput().getAbsoluteMouseX() - lastMouseX), gc);
 				
-			}
+			} else if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+				
+				if (this.currentEditor != null) this.currentEditor.checkExit(gc);
+				
+				if (play.isMouseOver() && !playing) {
+					
+					playing = true;
+					
+					play.setNormalImage(Main.USEFUL_BUTTONS.getSprite(1, 1));
+					play.setMouseOverImage(Main.USEFUL_BUTTONS.getSprite(1, 1));
+					
+					for (GameObject object : objects) {
+						
+						object.runScript();
+						
+					}
+				
+				} else if (stop.isMouseOver()) {
+					
+					playing = false;
+					play.setNormalImage(Main.USEFUL_BUTTONS.getSprite(0, 1));
+					play.setMouseOverImage(Main.USEFUL_BUTTONS.getSprite(0, 1));
+					
+					List<String> scripts = new ArrayList<String>();
+					
+					for (GameObject object : objects) {
+						
+						scripts.add(object.getScript());
+						
+					}
+					
+					try {
+						
+						this.objects = new ArrayList<GameObject>(level.getObjects());
+						
+					} catch (ParserConfigurationException | SAXException
+							| IOException e) {
+						
+						e.printStackTrace();
+						
+					}
+					
+					for (GameObject object : this.objects) {
+						
+						object.setScript(scripts.get(objects.indexOf(object)));
+						
+					}
+					
+				} else if (pause.isMouseOver()) {
+					
+					this.paused = true;
+					pause.setNormalImage(Main.USEFUL_BUTTONS.getSprite(0, 1));
+					pause.setMouseOverImage(Main.USEFUL_BUTTONS.getSprite(0, 1));
+					pause.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 1));
+					
+				}
+				
+			} 
 			
 			lastMouseX = gc.getInput().getAbsoluteMouseX();
 			lastMouseY = gc.getInput().getAbsoluteMouseY();
@@ -280,6 +401,36 @@ public class Game extends BasicGameState {
 			
 			(new Thread(new LevelLoadThread(id, this))).run();
 			init = true;
+			
+		} else if (paused && gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+			
+			if (pause.isMouseOver()) {
+				
+				this.paused = false;
+				pause.setNormalImage(Main.USEFUL_BUTTONS.getSprite(0, 0));
+				pause.setMouseOverImage(Main.USEFUL_BUTTONS.getSprite(0, 0));
+				pause.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 0));
+				
+			} else if (menu.isMouseOver()) {
+				
+				sbg.enterState(2, new FadeOutTransition(), new FadeInTransition());
+				
+			}
+			
+		} else if (error) {
+			
+			if (!errorCursor ) {
+				
+				gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(2, 0), 0, 0);
+				errorCursor = true;
+				
+			}
+			
+			if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON) && failed.isMouseOver()) {
+				
+				sbg.enterState(2, new FadeOutTransition(), new FadeInTransition());
+				
+			}
 			
 		}
 		

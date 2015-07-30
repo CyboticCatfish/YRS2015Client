@@ -30,7 +30,7 @@ public class Robot extends GameObject {
 	@Override
 	public void render(GameContainer gc, Graphics g) {
 		
-		g.drawImage(robot.getSprite(this.getDir(), 0), this.getRenderingX() - 12, this.getRenderingY() - 12);
+		g.drawImage(robot.getSprite(this.getDir(), 0), this.getRenderingX() - 8, this.getRenderingY() - 12);
 		
 	}
 

@@ -23,7 +23,7 @@ public class EditorPane {
 	private boolean firstPress = true, cursorShow = false, closing = false;
 	private Game game;
 	private GameObject object;
-	private MouseOverArea start, exit, stop;
+	private MouseOverArea exit;
 	private SpriteSheet buttons;
 	
 	public EditorPane(Game game, GameObject target, GameContainer gc) throws SlickException {
@@ -35,17 +35,9 @@ public class EditorPane {
 		this.object = target;
 		this.buttons = new SpriteSheet(Main.loadImage("res/buttons.png"), 24, 24);
 		
-		start = new MouseOverArea(gc, buttons.getSubImage(0, 0), gc.getWidth() - 32, gc.getHeight() - 32);
-			start.setMouseOverImage(buttons.getSubImage(1, 0));
-			start.setMouseDownImage(buttons.getSubImage(2, 0));
-			
 		exit = new MouseOverArea(gc, buttons.getSubImage(0, 1), (int) Math.ceil(gc.getWidth() - (targetWidth - 10)), gc.getHeight() - 32);
 			exit.setMouseOverImage(buttons.getSubImage(1, 1));
 			exit.setMouseDownImage(buttons.getSubImage(2, 1));
-			
-		stop = new MouseOverArea(gc, buttons.getSubImage(0, 2), gc.getWidth() - 72, gc.getHeight() - 32);
-			stop.setMouseOverImage(buttons.getSubImage(1, 2));
-			stop.setMouseDownImage(buttons.getSubImage(2, 2));
 
 	}
 	
@@ -115,9 +107,7 @@ public class EditorPane {
 		
 		g.translate(- x + targetWidth, 0);
 		
-		start.render(gc, g);
 		exit.render(gc, g);
-		stop.render(gc, g);
 		
 		g.resetTransform();
 		
@@ -142,34 +132,6 @@ public class EditorPane {
 		
 		if (closing) game.closeEditor(gc);
 		else {
-			
-			if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON) && gc.getInput().getAbsoluteMouseX() > gc.getWidth() - targetWidth + 6) {
-				
-				if (start.isMouseOver()) {
-					
-					this.getTarget().setScript(this.getCurrentScript());
-					this.getTarget().runScript();
-					
-				} else if (exit.isMouseOver()) {
-					
-					this.getTarget().setScript(this.getCurrentScript());
-					this.close();
-					
-				} else if (stop.isMouseOver() &&  object.isScriptRunning()) {
-					
-					this.getTarget().getScriptEnv().interupt();
-					
-				} else {
-					
-					currentLine = (int) Math.floor(gc.getInput().getAbsoluteMouseY() / 13f);
-					if (currentLine > this.currentScript.size() - 1) currentLine = currentScript.size() - 1;
-					cursorPosition = (int) Math.floor((gc.getInput().getAbsoluteMouseX() - gc.getWidth() + targetWidth)/ 6.5f);
-					if (cursorPosition > this.currentScript.get(currentLine).length()) cursorPosition = currentScript.get(currentLine).length();
-					else if (cursorPosition < 0) cursorPosition = 0;
-					
-				}
-				
-			}
 			
 			flash += 0.1f * delta;
 			if (flash > 30f) {
@@ -316,6 +278,29 @@ public class EditorPane {
 		}
 		
 		exit.setX((int) Math.ceil(gc.getWidth() - (targetWidth - 10)));
+		
+	}
+	
+	public void checkExit(GameContainer gc) {
+		
+		if (gc.getInput().getAbsoluteMouseX() > gc.getWidth() - targetWidth + 6) {
+			
+			if (exit.isMouseOver()) {
+				
+				this.getTarget().setScript(this.getCurrentScript());
+				this.close();
+				
+			} else {
+				
+				currentLine = (int) Math.floor(gc.getInput().getAbsoluteMouseY() / 13f);
+				if (currentLine > this.currentScript.size() - 1) currentLine = currentScript.size() - 1;
+				cursorPosition = (int) Math.floor((gc.getInput().getAbsoluteMouseX() - gc.getWidth() + targetWidth)/ 6.5f);
+				if (cursorPosition > this.currentScript.get(currentLine).length()) cursorPosition = currentScript.get(currentLine).length();
+				else if (cursorPosition < 0) cursorPosition = 0;
+				
+			}
+			
+		}
 		
 	}
 

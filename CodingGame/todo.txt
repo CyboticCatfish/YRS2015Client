@@ -1,10 +1,24 @@
-Make a bunch of objects
-Make levels completable 
-Implement scoring algorithms
-
-Screens
-
-Login screen
 Main menu (inc level select)
-Pause menu
+ - toggle switches for in game sound and music 
+ - must display a list of the users subscribed levels and allow them to be scrolled through (whether that is with arrows or with a scroll bar)
+ - add a title
+ 
+Objects to make:
+
+	- bomb
+	- coin
+	- door
+	- pressure plate
+	- sliding wall (ie pushable block)
+	- wall (ie static block)
+
+Make levels completable 
+
 Score screen
+ - title
+ - what the score was
+   - could be based on how long the level was running?
+   - could also be based on the amount of code run to complete the level?
+ - add a return to the main menu button
+ 
+ Levels
