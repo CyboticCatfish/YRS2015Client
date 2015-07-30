@@ -211,7 +211,7 @@ public class Game extends BasicGameState {
 					
 					for (GameObject object : tempObjects) {
 						
-						object.render(gc, g);
+						if (!object.isDead()) object.render(gc, g);
 						
 					}
 			

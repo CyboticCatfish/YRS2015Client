@@ -1,11 +1,10 @@
 Objects to make:
-
-	- bomb
-	- coin
-	- door
-	- pressure plate
-	- sliding wall (ie pushable block)
-	- wall (ie static block)
+ - bomb
+ - door
+ - pressure plate
+ - sliding wall (ie pushable block)
+ - ghost
+ - laser
 
 Make levels completable 
 

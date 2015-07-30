@@ -17,8 +17,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import net.cybotic.catfish.src.game.object.Coin;
 import net.cybotic.catfish.src.game.object.GameObject;
 import net.cybotic.catfish.src.game.object.Robot;
+import net.cybotic.catfish.src.game.object.Wall;
 
 public class Level {
 	
@@ -26,6 +28,7 @@ public class Level {
 	private List<GameObject> objects;
 	private String XML;
 	private Game game;
+	private int totalCoins = 0;
 	
 	public Level(String XML, Game game) throws ParserConfigurationException, SAXException, IOException, SlickException {
 		
@@ -86,9 +89,12 @@ public class Level {
 				if (eElement.hasAttribute("collidable")) collidable = Boolean.parseBoolean(eElement.getAttribute("collidable"));
 				if (eElement.hasAttribute("listenerLevel")) listenerLevel = Integer.parseInt(eElement.getAttribute("listenerLevel"));
 				
-				if (id == 0) {
+				if (id == 0) this.objects.add(new Robot(x, y, dir, script, game, collidable));
+				else if (id == 1) this.objects.add(new Wall(x, y, game));
+				else if (id == 2) {
 					
-					this.objects.add(new Robot(x, y, z, dir, script, scriptable, game, "robot", collidable, listenerLevel));
+					this.objects.add(new Coin(x, y, game));
+					totalCoins += 1;
 					
 				}
 				
@@ -109,6 +115,12 @@ public class Level {
 	public int getHeight() {
 		
 		return this.height;
+		
+	}
+	
+	public int getTotalCoins() {
+		
+		return this.totalCoins;
 		
 	}
 

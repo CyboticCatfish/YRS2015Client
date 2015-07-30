@@ -1,13 +1,6 @@
 package net.cybotic.catfish.src;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,8 +25,6 @@ import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeInTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.util.BufferedImageUtil;
-import org.xml.sax.InputSource;
-
 import com.github.kevinsawicki.http.HttpRequest;
 
 public class Menu extends BasicGameState {
@@ -270,7 +261,7 @@ public class Menu extends BasicGameState {
 				selected -= 1;
 				if (selected < 0) selected = this.subscriptions.size() - 1;
 				
-			} else if (levels.isMouseOver() && !this.loading) {
+			} else if (levels.isMouseOver()) {
 				
 				try {
 					

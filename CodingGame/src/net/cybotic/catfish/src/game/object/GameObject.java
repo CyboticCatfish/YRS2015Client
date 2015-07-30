@@ -15,6 +15,7 @@ public abstract class GameObject {
 	private ScriptEnv scriptEnv;
 	private String script, name;
 	Game game;
+	private boolean dead = false;
 	
 	public GameObject(int x, int y, int z, int dir, String script, boolean scriptable, Game game, String name, boolean collidable, int listenerLevel) {
 		
@@ -227,5 +228,19 @@ public abstract class GameObject {
 	}
 	
 	public abstract void trigger();
+	
+	public void die() {
+		
+		this.dead  = true;
+		this.collidable = false;
+		this.scriptable = false;
+		
+	}
+
+	public boolean isDead() {
+		
+		return this.dead;
+		
+	}
 	
 }
