@@ -1,11 +1,15 @@
 package net.cybotic.catfish.src;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.GameContainer;
@@ -101,6 +105,36 @@ public class Main extends StateBasedGame {
 		
 		br.close();
 		
+	}
+	
+	public static void openWebpage(URI uri) {
+		
+	    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+	    
+	    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+	        try {
+	        	
+	            desktop.browse(uri);
+	            
+	        } catch (Exception e) {
+	        	
+	            e.printStackTrace();
+	            
+	        }
+	    }
+	}
+
+	public static void openWebpage(URL url) {
+		
+	    try {
+	    	
+	        openWebpage(url.toURI());
+	        
+	    } catch (URISyntaxException e) {
+	    	
+	        e.printStackTrace();
+	        
+	    }
 	}
 	
 }

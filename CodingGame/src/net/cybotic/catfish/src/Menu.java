@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,11 +41,11 @@ public class Menu extends BasicGameState {
 	private Image logo, back;
 	private boolean loading = true;
 	private int selected = 0;
-	private MouseOverArea left, right, play, mute, exit;
+	private MouseOverArea left, right, play, mute, exit, levels;
 	private List<LevelCard> subscriptions;
 	private MenuLoadingThread loadingThread;
-	private boolean muted = false, init = false, changing = true, changingUp = true;
-	private float alpha = 0f;
+	private boolean muted = false, init = false;
+	private float x = 0f;
 	
 	public class MenuLoadingThread implements Runnable {
 		
@@ -86,7 +87,7 @@ public class Menu extends BasicGameState {
 					String name = responses[0], creator = responses[1];
 					Image image;
 					 
-					URL u = new URL(Main.SERVER_URL + "/level/get/image?id=" + id + "&x=140&y=100");
+					URL u = new URL(Main.SERVER_URL + "/level/get/image?id=" + id + "&x=292&y=144");
 
 				    BufferedImage bi = ImageIO.read(u);
 				    Texture texture = BufferedImageUtil.getTexture("picture", bi);
@@ -126,6 +127,7 @@ public class Menu extends BasicGameState {
 	public void init(GameContainer gc, StateBasedGame sbg)
 			throws SlickException {
 		
+		x = gc.getWidth();
 		loadingThread = new MenuLoadingThread();
 		
 		subscriptions = new ArrayList<LevelCard>();
@@ -140,11 +142,15 @@ public class Menu extends BasicGameState {
 			exit.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 3));
 		mute = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 5), 44, 4);
 			mute.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 5));
-		left = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 1).getFlippedCopy(true, false), gc.getWidth() / 2 - 190, gc.getHeight() / 2 - 16);
+		left = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 1).getFlippedCopy(true, false), gc.getWidth() / 2 - 190, gc.getHeight() / 2 + 4);
 			left.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 1).getFlippedCopy(true, false));
-		right = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 1), gc.getWidth() / 2 + 158, gc.getHeight() / 2 - 16);
+		right = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 1), gc.getWidth() / 2 + 158, gc.getHeight() / 2 + 4);
 			right.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 1));
-		
+			
+		play = new MouseOverArea(gc, Main.BIG_BUTTON.getSprite(0, 0), gc.getWidth() / 2 - 64, gc.getHeight() / 2 + back.getHeight() / 2 + 52);
+			play.setMouseDownImage(Main.BIG_BUTTON.getSprite(0, 1));
+		levels = new MouseOverArea(gc, Main.BIG_BUTTON.getSprite(0, 0), gc.getWidth() / 2 - 64, gc.getHeight() / 2 + back.getHeight() / 2 + 92);
+			levels.setMouseDownImage(Main.BIG_BUTTON.getSprite(0, 1));
 	}
 
 	@Override
@@ -153,32 +159,44 @@ public class Menu extends BasicGameState {
 		
 		
 		g.setBackground(new Color(30, 36, 38));
-		
 		g.drawImage(logo, gc.getWidth() / 2 - logo.getWidth() / 2, 40);
+		
+		Main.GAME_FONT.drawString(gc.getWidth() / 2 - 18 * 8, 180, "YOUR SUBSCRIPTIONS");
+		
+		g.drawImage(back, gc.getWidth() / 2 - 150, gc.getHeight() / 2 - 80);
 		
 		if (loading) {
 			
-			if (!loadingThread.hasErrored()) Main.GAME_FONT.drawString(gc.getWidth() / 2 - 9 * 11 + 20, gc.getHeight() / 2 - 8, "LOADING...");
-			else Main.GAME_FONT.drawString(gc.getWidth() / 2 - 14 * 10, gc.getHeight() / 2 - 8, "SERVER TIMED OUT!");
+			if (!loadingThread.hasErrored()) Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 9 * 11 + 20, gc.getHeight() / 2 + 12, "LOADING...");
+			else Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 14 * 10, gc.getHeight() / 2 + 12, "SERVER TIMED OUT!");
 			
 		} else {
 			
-			g.drawImage(back, gc.getWidth() / 2 - 150, gc.getHeight() / 2 - 100);
+			Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 24, subscriptions.get(selected).getName());
+			Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 44, "BY " + subscriptions.get(selected).getCreator());
+			g.drawImage(subscriptions.get(selected).getImage(), gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 68);
 			
 		}
 		
-		exit.render(gc, g);
-		mute.render(gc, g);
 		right.render(gc, g);
 		left.render(gc, g);
+		
+		play.render(gc, g);
+		levels.render(gc, g);
+		
+		Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 30, gc.getHeight() / 2 + back.getHeight() / 2 + 56, "PLAY");
+		Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 46, gc.getHeight() / 2 + back.getHeight() / 2 + 96, "LEVELS");
+		
+		exit.render(gc, g);
+		mute.render(gc, g);
+		
+		Main.GAME_FONT.drawString(x, gc.getHeight() - 40, "(C) 2015 CYBOTIC CATFISH // MADE IN A WEEK FOR YRS 2015 // FRONT END BY NATE // BACK END BY LEVI // AVAILABLE ON GITHUB // SPECIAL THANKS TO THE NOTTINGHAM HACKSPACE FOR LETTING US EXIST // ALSO THANKS TO TAIIWO JUST BECAUSE // AND FINALLY THANKS TO JAMES WHO MAY OR MAY NOT HAVE MADE THE WEBSITE");
 		
 	}
 
 	@Override
 	public void update(GameContainer gc, StateBasedGame sbg, int delta)
 			throws SlickException {
-		
-		back.setAlpha(alpha);
 		
 		if (!init) {
 			
@@ -188,41 +206,20 @@ public class Menu extends BasicGameState {
 			
 		}
 		
-		if (loadingThread.isDone() && !loadingThread.hasErrored()) loading = false;
+		if (loadingThread.isDone() && !loadingThread.hasErrored()) {
+			
+			loading = false;
+			
+		}
 		
-		if (changing && !loading) {
-				
-			if (changingUp) {
-				
-				if (alpha < 1f) alpha += 0.001f * delta;
-				if (alpha > 1f) {
-					
-					alpha = 1f;
-					changingUp = false;
-					changing = false;
-					
-				}
-				
-			} else {
-				
-				if (alpha > 0f) alpha -= 0.01f * delta;
-				if (alpha < 0f) {
-					
-					alpha = 0f;
-					changingUp = true;
-					
-				}
-				
-			}
+		if (!loading) {
+			
+			x -= 0.1f * delta;
+			if (x < - 5000) x = gc.getWidth();
 			
 		}
 		
 		if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-			
-			/**Game game = new Game(3);
-			sbg.addState(game);
-			sbg.enterState(3, new FadeOutTransition(), new FadeInTransition());
-			game.init(gc, sbg);**/
 			
 			if (mute.isMouseOver()) {
 				
@@ -256,6 +253,35 @@ public class Menu extends BasicGameState {
 				
 				gc.exit();
 				
+			} else if (play.isMouseOver() && !this.loading) {
+				
+				Game game = new Game(this.subscriptions.get(selected).getID());
+				sbg.addState(game);
+				game.init(gc, sbg);
+				sbg.enterState(3, new FadeOutTransition(), new FadeInTransition());
+				
+			} else if (right.isMouseOver() && !this.loading) {
+				
+				selected += 1;
+				if (selected > this.subscriptions.size() - 1) selected = 0;
+				
+			} else if (left.isMouseOver() && !this.loading) {
+				
+				selected -= 1;
+				if (selected < 0) selected = this.subscriptions.size() - 1;
+				
+			} else if (levels.isMouseOver() && !this.loading) {
+				
+				try {
+					
+					Main.openWebpage(new URL("http://c404.mrmindimplosion.co.uk:5000"));
+					
+				} catch (MalformedURLException e) {
+					
+					e.printStackTrace();
+					
+				}
+				
 			}
 			
 		}
@@ -278,8 +304,8 @@ public class Menu extends BasicGameState {
 		public LevelCard(int id, String name, String creator, Image image) {
 			
 			this.id = id;
-			this.name = name;
-			this.creator = creator;
+			this.name = name.toUpperCase();
+			this.creator = creator.toUpperCase();
 			this.image = image;
 			
 		}

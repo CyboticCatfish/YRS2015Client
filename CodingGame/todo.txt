@@ -1,8 +1,3 @@
-Main menu (inc level select)
- - toggle switches for in game sound and music 
- - must display a list of the users subscribed levels and allow them to be scrolled through (whether that is with arrows or with a scroll bar)
- - add a title
- 
 Objects to make:
 
 	- bomb
@@ -20,5 +15,11 @@ Score screen
    - could be based on how long the level was running?
    - could also be based on the amount of code run to complete the level?
  - add a return to the main menu button
+
+Sound
  
- Levels
+PowerPoint
+ 
+Website
+ 
+Levels

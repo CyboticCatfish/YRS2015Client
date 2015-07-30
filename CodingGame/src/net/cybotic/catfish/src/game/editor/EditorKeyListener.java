@@ -86,6 +86,8 @@ public class EditorKeyListener implements KeyListener {
 			
 		}
 		
+		game.getCurrentEditor().getTarget().setScript(game.getCurrentEditor().getCurrentScript());
+		
 	}
 
 	@Override
