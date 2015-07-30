@@ -18,7 +18,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import net.cybotic.catfish.src.game.object.Coin;
+import net.cybotic.catfish.src.game.object.Door;
 import net.cybotic.catfish.src.game.object.GameObject;
+import net.cybotic.catfish.src.game.object.PressurePlate;
 import net.cybotic.catfish.src.game.object.Robot;
 import net.cybotic.catfish.src.game.object.Wall;
 
@@ -55,6 +57,8 @@ public class Level {
 	}
 	
 	public List<GameObject> getObjects() throws ParserConfigurationException, SAXException, IOException, SlickException {
+		
+		totalCoins = 0;
 		
 		objects = new ArrayList<GameObject>();
 		
@@ -96,7 +100,8 @@ public class Level {
 					this.objects.add(new Coin(x, y, game));
 					totalCoins += 1;
 					
-				}
+				} else if (id == 3) this.objects.add(new PressurePlate(x, y, game, listenerLevel));
+				 else if (id == 4) this.objects.add(new Door(x, y, dir, game, listenerLevel));
 				
 			}
 			

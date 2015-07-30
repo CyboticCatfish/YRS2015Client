@@ -26,7 +26,7 @@ public class Coin extends GameObject {
 	}
 
 	@Override
-	public void update(GameContainer gc, int delta) {
+	public void update(GameContainer gc, int delta) throws SlickException {
 		
 		if (up) {
 			
@@ -48,6 +48,21 @@ public class Coin extends GameObject {
 				
 			}
 			
+		}
+		
+		if (!this.isDead()) {
+		
+			for (GameObject object : game.getGameObjects()) {
+				
+				if (object.getX() == this.getX() && object.getY() == this.getY() && (object instanceof Robot) && !object.isDead() && object.isCollidable()) {
+					
+					game.getCoin(gc);
+					this.die();
+					
+				}
+				
+			}
+		
 		}
 		
 	}

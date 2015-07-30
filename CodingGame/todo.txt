@@ -1,24 +1,11 @@
 Objects to make:
  - bomb
- - door
- - pressure plate
  - sliding wall (ie pushable block)
  - ghost
  - laser
 
-Make levels completable 
-
-Score screen
- - title
- - what the score was
-   - could be based on how long the level was running?
-   - could also be based on the amount of code run to complete the level?
- - add a return to the main menu button
-
-Sound
- 
+Sound 
 PowerPoint
- 
+Video
 Website
- 
 Levels

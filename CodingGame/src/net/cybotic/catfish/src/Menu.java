@@ -17,6 +17,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.Music;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.gui.MouseOverArea;
 import org.newdawn.slick.opengl.Texture;
@@ -25,6 +26,7 @@ import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeInTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.util.BufferedImageUtil;
+
 import com.github.kevinsawicki.http.HttpRequest;
 
 public class Menu extends BasicGameState {
@@ -163,8 +165,8 @@ public class Menu extends BasicGameState {
 			
 		} else {
 			
-			Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 24, subscriptions.get(selected).getName());
-			Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 44, "BY " + subscriptions.get(selected).getCreator());
+			Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 24, subscriptions.get(selected).getName().toUpperCase());
+			Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 44, "BY " + subscriptions.get(selected).getCreator().toUpperCase());
 			g.drawImage(subscriptions.get(selected).getImage(), gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 68);
 			
 		}
@@ -181,7 +183,7 @@ public class Menu extends BasicGameState {
 		exit.render(gc, g);
 		mute.render(gc, g);
 		
-		Main.GAME_FONT.drawString(x, gc.getHeight() - 40, "(C) 2015 CYBOTIC CATFISH // MADE IN A WEEK FOR YRS 2015 // FRONT END BY NATE // BACK END BY LEVI // AVAILABLE ON GITHUB // SPECIAL THANKS TO THE NOTTINGHAM HACKSPACE FOR LETTING US EXIST // ALSO THANKS TO TAIIWO JUST BECAUSE // AND FINALLY THANKS TO JAMES WHO MAY OR MAY NOT HAVE MADE THE WEBSITE");
+		Main.GAME_FONT.drawString(x, gc.getHeight() - 40, "(C) 2015 CYBOTIC CATFISH // MADE IN A WEEK FOR YRS 2015 // FRONT END BY NATE // BACK END BY LEVI // MUSIC BY LENNO LIU // AVAILABLE ON GITHUB // SPECIAL THANKS TO THE NOTTINGHAM HACKSPACE FOR LETTING US EXIST // ALSO THANKS TO TAIIWO JUST BECAUSE");
 		
 	}
 
@@ -190,6 +192,9 @@ public class Menu extends BasicGameState {
 			throws SlickException {
 		
 		if (!init) {
+			
+			Music music = new Music("res/music.wav");
+			music.loop();
 			
 			(new Thread(loadingThread)).run();
 			
@@ -246,7 +251,7 @@ public class Menu extends BasicGameState {
 				
 			} else if (play.isMouseOver() && !this.loading) {
 				
-				Game game = new Game(this.subscriptions.get(selected).getID());
+				Game game = new Game(this.subscriptions.get(selected).getID(), this.subscriptions.get(selected).getName(), this.subscriptions.get(selected).getCreator());
 				sbg.addState(game);
 				game.init(gc, sbg);
 				sbg.enterState(3, new FadeOutTransition(), new FadeInTransition());
@@ -295,9 +300,11 @@ public class Menu extends BasicGameState {
 		public LevelCard(int id, String name, String creator, Image image) {
 			
 			this.id = id;
-			this.name = name.toUpperCase();
-			this.creator = creator.toUpperCase();
+			this.name = name;
+			this.creator = creator;
 			this.image = image;
+			
+			if (name.length() > 15) name = name.substring(0, 12) + "...";
 			
 		}
 		

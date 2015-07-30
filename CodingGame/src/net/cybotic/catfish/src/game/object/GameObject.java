@@ -11,7 +11,8 @@ public abstract class GameObject {
 	
 	private int x, y, z = 0, dir, listenerLevel = 0;
 	private float renderingX, renderingY;
-	private boolean moving = false, scriptRunning = false, scriptable = false, collidable = false;
+	private boolean moving = false, scriptRunning = false, scriptable = false;
+	protected boolean collidable = false;
 	private ScriptEnv scriptEnv;
 	private String script, name;
 	Game game;
@@ -22,6 +23,7 @@ public abstract class GameObject {
 		this.scriptEnv = new ScriptEnv(this);
 		this.x = x;
 		this.y = y;
+		this.setZ(z);
 		this.renderingX = x * 32;
 		this.renderingY = y * 32;
 		this.dir = dir;
@@ -34,35 +36,39 @@ public abstract class GameObject {
 		
 	}
 	
-	public abstract void update(GameContainer gc, int delta);
+	public abstract void update(GameContainer gc, int delta) throws SlickException;
 	public abstract void render(GameContainer gc, Graphics g);
 	
 	public void preUpdate(GameContainer gc, int delta) throws SlickException {
 		
-		if (this.moving && this.scriptable) {
-			
-			if (renderingY < y * 32 && dir == 2) renderingY += 0.1f * delta;
-			else if (renderingX > x * 32 && dir == 3) renderingX -= 0.1f * delta;
-			else if (renderingY > y * 32 && dir == 0) renderingY -= 0.1f * delta;
-			else if (renderingX < x * 32 && dir == 1) renderingX += 0.1f * delta;
-			else {
+		if (!this.isDead()) {
+		
+			if (this.moving) {
 				
-				this.renderingX = x * 32;
-				this.renderingY = y * 32;
-				
-				moving = false;
+				if (renderingY < y * 32 && dir == 2) renderingY += 0.1f * delta;
+				else if (renderingX > x * 32 && dir == 3) renderingX -= 0.1f * delta;
+				else if (renderingY > y * 32 && dir == 0) renderingY -= 0.1f * delta;
+				else if (renderingX < x * 32 && dir == 1) renderingX += 0.1f * delta;
+				else {
+					
+					this.renderingX = x * 32;
+					this.renderingY = y * 32;
+					
+					moving = false;
+					
+				}
 				
 			}
 			
-		}
+			this.update(gc, delta);
 		
-		this.update(gc, delta);
+		}
 		
 	}
 	
 	public void runScript() {
 		
-		if (!scriptRunning && this.scriptable) {
+		if (!scriptRunning) {
 		
 			scriptEnv.launchScript();
 			scriptRunning = true;
@@ -240,6 +246,12 @@ public abstract class GameObject {
 	public boolean isDead() {
 		
 		return this.dead;
+		
+	}
+
+	public void setZ(int z) {
+		
+		this.z = z;
 		
 	}
 	

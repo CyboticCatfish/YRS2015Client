@@ -1,9 +1,9 @@
 package net.cybotic.catfish.src.game;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,6 +16,7 @@ import net.cybotic.catfish.src.game.object.GameObject;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
@@ -42,8 +43,11 @@ public class Game extends BasicGameState {
 	private Level level;
 	private int width, height, id = 0;
 	private SpriteSheet tiles;
-	private MouseOverArea play, stop, failed, pause, menu;
-	private boolean errorCursor = false;
+	private MouseOverArea play, stop, failed, pause, menu, tweet;
+	private boolean errorCursor = false, completed = false;
+	private int coins = 0;
+	private Image coin;
+	private String name, creator;
 	
 	public class LevelLoadThread implements Runnable {
 		
@@ -89,9 +93,11 @@ public class Game extends BasicGameState {
 		
 	}
 	
-	public Game(int id) {
+	public Game(int id, String name, String creator) {
 
 		this.id = id;
+		this.name = name;
+		this.creator = creator;
 		
 	}
 	
@@ -110,6 +116,8 @@ public class Game extends BasicGameState {
 		FONT.addAsciiGlyphs();
 		FONT.getEffects().add(new ColorEffect());
 		FONT.loadGlyphs();
+		
+		coin = Main.loadImage("res/coin.png");
 	
 		EditorKeyListener listener = new EditorKeyListener(this);
 		gc.getInput().addKeyListener(listener);
@@ -126,6 +134,13 @@ public class Game extends BasicGameState {
 			pause.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 0));
 		menu = new MouseOverArea(gc, Main.BIG_BUTTON.getSprite(0, 0), gc.getWidth() / 2 - 64, gc.getHeight() / 2 + 16);
 			menu.setMouseDownImage(Main.BIG_BUTTON.getSprite(0, 1));
+			
+		SpriteSheet sheet = new SpriteSheet(Main.loadImage("res/tweet.png"), 128, 32);
+		
+		tweet = new MouseOverArea(gc, sheet.getSprite(0, 0), gc.getWidth() / 2 - 64, gc.getHeight() / 2 + 56);
+			tweet.setMouseDownImage(sheet.getSprite(0, 1));
+	
+		coins = 0;
 		
 	}
 
@@ -186,47 +201,36 @@ public class Game extends BasicGameState {
 				
 			}
 			
-			for (int x = 0; x < this.getWidth(); x++) {
+			for (int z = 0; z < 6; z++) {
 			
-				for (int y = 0; y < this.getHeight(); y++) {
-					
-					List<GameObject> tempObjects = new ArrayList<GameObject>();
-					
-					for (GameObject object : objects) {
+				for (int x = 0; x < this.getWidth(); x++) {
+				
+					for (int y = 0; y < this.getHeight(); y++) {
 						
-						if (object.getX() == x && object.getY() == y) tempObjects.add(object);
-						
+						for (GameObject object : objects) {
+							
+							if (object.getX() == x && object.getY() == y && object.getZ() == z && !object.isDead()) object.render(gc, g);
+							
+						}
+				
 					}
-					
-					Collections.sort(tempObjects, new Comparator<GameObject>() {
-						
-				        @Override
-				        public int compare(GameObject object1, GameObject object2) {
-				        	
-				            return  object1.getZ() - object2.getZ();
-				            
-				        }
-				        
-				    });
-					
-					for (GameObject object : tempObjects) {
-						
-						if (!object.isDead()) object.render(gc, g);
-						
-					}
-			
+				
 				}
 			
 			}
 			
 			g.resetTransform();
 			
+			Main.GAME_FONT.drawString(gc.getWidth() / 2 - Main.GAME_FONT.getWidth(coins + "/" + level.getTotalCoins()) / 2, 50, coins + "/" + level.getTotalCoins());
+			
+			g.drawImage(coin, gc.getWidth() / 2 - Main.GAME_FONT.getWidth(coins + "/" + level.getTotalCoins()) / 2 - 20, 52);
+			
 			play.render(gc, g);
 			stop.render(gc, g);
 			
 			if (this.currentEditor != null) currentEditor.render(gc, g);
 			
-			if (paused) {
+			if (paused | completed) {
 				
 				g.setColor(new Color(0, 0, 0, 125));
 				g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
@@ -234,7 +238,16 @@ public class Game extends BasicGameState {
 				
 				menu.render(gc, g);
 				Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 4 * 9 + 4, gc.getHeight() / 2 + 20, "MENU");
-				Main.GAME_FONT.drawString(gc.getWidth() / 2 - 6 * 9 + 8, gc.getHeight() / 2 - 20, "PAUSED");
+				if (paused) Main.GAME_FONT.drawString(gc.getWidth() / 2 - 6 * 9 + 8, gc.getHeight() / 2 - 20, "PAUSED");
+				else if (completed) {
+					
+					Main.GAME_FONT.drawString(gc.getWidth() / 2 - 16 * 9 + 8, gc.getHeight() / 2 - 52, "LEVEL COMPLETE!!");
+					Main.GAME_FONT.drawString(gc.getWidth() / 2 - (new String("YOU SCORED " + (1000 - this.getScore()) + "!!!")).length() * 9 + 8, gc.getHeight() / 2 - 20, "YOU SCORED " + (1000 - this.getScore()) + "!!!");
+					
+					tweet.render(gc, g);
+					Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 5 * 9 + 4, gc.getHeight() / 2 + 60, "TWEET");
+					
+				}
 				
 			}
 			
@@ -254,11 +267,26 @@ public class Game extends BasicGameState {
 				
 	}
 
+	private int getScore() {
+		
+		int score = 0;
+		
+		
+		for (GameObject object : objects) {
+			
+			score += object.getScript().length();
+			
+		}
+		
+		return score;
+		
+	}
+
 	@Override
 	public void update(GameContainer gc, StateBasedGame sbg, int delta)
 			throws SlickException {
 		
-		if (!loading && !paused) {
+		if (!loading && !paused && !completed) {
 		
 			if (this.currentEditor != null) currentEditor.update(gc, delta);
 			
@@ -354,6 +382,8 @@ public class Game extends BasicGameState {
 				
 				} else if (stop.isMouseOver()) {
 					
+					coins = 0;
+					
 					playing = false;
 					play.setNormalImage(Main.USEFUL_BUTTONS.getSprite(0, 1));
 					play.setMouseOverImage(Main.USEFUL_BUTTONS.getSprite(0, 1));
@@ -432,6 +462,26 @@ public class Game extends BasicGameState {
 				
 			}
 			
+		} else if (completed && gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+			
+			if (menu.isMouseOver()) {
+				
+				sbg.enterState(2, new FadeOutTransition(), new FadeInTransition());
+				
+			} else if (tweet.isMouseOver()) {
+				
+				try {
+					
+					Main.openWebpage(new URL("https://twitter.com/intent/tweet?text=I%20just%20scored%20950%20points%20playing%20%23Code404%20on%20" + name.replaceAll(" ", "%20") + "%20by%20" + creator.replaceAll(" ", "%20") + "!!%20%23YRS2015"));
+					
+				} catch (MalformedURLException e) {
+					
+					e.printStackTrace();
+					
+				}
+				
+			}
+			
 		}
 		
 	}
@@ -505,6 +555,14 @@ public class Game extends BasicGameState {
 			if (object.getListenerLevel() == triggerLevel) object.trigger();
 			
 		}
+		
+	}
+	
+	public void getCoin(GameContainer gc) throws SlickException {
+		
+		this.coins += 1;
+		if (coins == level.getTotalCoins()) completed = true;
+		gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(2, 0), 0, 0);
 		
 	}
 	
