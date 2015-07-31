@@ -22,6 +22,7 @@ import net.cybotic.catfish.src.game.object.Coin;
 import net.cybotic.catfish.src.game.object.Door;
 import net.cybotic.catfish.src.game.object.GameObject;
 import net.cybotic.catfish.src.game.object.Ghost;
+import net.cybotic.catfish.src.game.object.Laser;
 import net.cybotic.catfish.src.game.object.PressurePlate;
 import net.cybotic.catfish.src.game.object.Robot;
 import net.cybotic.catfish.src.game.object.Wall;
@@ -77,9 +78,9 @@ public class Level {
 			Node nNode = nList.item(temp);
 			Element eElement = (Element) nNode;
 				
-			if (eElement.hasAttribute("typeid")) {
+			if (eElement.hasAttribute("type")) {
 				
-				int id = Integer.parseInt(eElement.getAttribute("typeid"));
+				String type = eElement.getAttribute("type");
 				int x = 0, y = 0, dir = 2, listenerLevel = 0;
 				boolean scriptable = false, collidable = true;
 				String script = eElement.getTextContent();
@@ -94,17 +95,18 @@ public class Level {
 				if (eElement.hasAttribute("collidable")) collidable = Boolean.parseBoolean(eElement.getAttribute("collidable"));
 				if (eElement.hasAttribute("listenerLevel")) listenerLevel = Integer.parseInt(eElement.getAttribute("listenerLevel"));
 				
-				if (id == 0) this.objects.add(new Robot(x, y, dir, script, game, collidable));
-				else if (id == 1) this.objects.add(new Wall(x, y, game));
-				else if (id == 2) {
+				if (type.equals("robot")) this.objects.add(new Robot(x, y, dir, script, game, collidable));
+				else if (type.equals("wall")) this.objects.add(new Wall(x, y, game));
+				else if (type.equals("coin")) {
 					
 					this.objects.add(new Coin(x, y, game));
 					totalCoins += 1;
 					
-				} else if (id == 3) this.objects.add(new PressurePlate(x, y, game, listenerLevel));
-				else if (id == 4) this.objects.add(new Door(x, y, dir, game, listenerLevel));
-				else if (id == 5) this.objects.add(new Bomb(x, y, script, scriptable, game, listenerLevel));
-				else if (id == 6) this.objects.add(new Ghost(x, y, dir, script, game));
+				} else if (type.equals("pressurePlate")) this.objects.add(new PressurePlate(x, y, game, listenerLevel));
+				else if (type.equals("door")) this.objects.add(new Door(x, y, dir, game, listenerLevel));
+				else if (type.equals("bomb")) this.objects.add(new Bomb(x, y, script, scriptable, game, listenerLevel));
+				else if (type.equals("ghost")) this.objects.add(new Ghost(x, y, dir, script, game));
+				else if (type.equals("laser")) this.objects.add(new Laser(x, y, game, listenerLevel));
 				
 			}
 			

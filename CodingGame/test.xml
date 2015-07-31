@@ -1,33 +1,25 @@
 
 <level width="7" height="7">
-    <object x="3" y="0" typeid="0">
-	while(true) {
+    <object x="3" y="0" type="robot">
+	
 	   object.moveForward();
-	}
+	   
     </object>
     
-    <object x="3" y="1" typeid="3" listenerLevel="4"/>
+    <object x="3" y="1" type="pressurePlate" listenerLevel="4"/>
     
-   	<object x="0" y="3" typeid="1"/>
-   	<object x="1" y="3" typeid="1"/>
-   	<object x="2" y="3" typeid="1"/>
-   	<object x="3" y="3" typeid="4" listenerLevel="4"/>
-   	<object x="4" y="3" typeid="1"/>
-   	<object x="5" y="3" typeid="1"/>
-   	<object x="6" y="3" typeid="1"/>
+   	<object x="0" y="3" type="wall"/>
+   	<object x="1" y="3" type="wall"/>
+   	<object x="2" y="3" type="wall"/>
+   	<object x="3" y="3" type="door" listenerLevel="4"/>
+   	<object x="4" y="3" type="wall"/>
+   	<object x="5" y="3" type="wall"/>
+   	<object x="6" y="3" type="wall"/>
    	
-   	<object x="3" y="6" typeid="2"/>
+   	<object x="3" y="6" type="coin"/>
    	
-   	<object x="3" y="4" typeid="5" listenerLevel="6" scriptable="true"/>
+   	<object x="3" y="4" type="bomb" listenerLevel="6" scriptable="true"/>
    	
-   	<object x="1" y="1" typeid="6">
+   	<object x="5" y="1" type="laser" listenerLevel="4"/>
    	
-   		while (true) {
-   		
-   			object.moveForward();
-   			object.turnClockwise();
-   		
-   		}
-   	
-   	</object>
 </level>

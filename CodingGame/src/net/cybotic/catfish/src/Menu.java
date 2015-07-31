@@ -270,7 +270,7 @@ public class Menu extends BasicGameState {
 				
 				try {
 					
-					Main.openWebpage(new URL("http://c404.mrmindimplosion.co.uk:5000"));
+					Main.openWebpage(new URL("http://c404.mrmindimplosion.co.uk:5000?token=" + Main.LOGIN_TOKEN));
 					
 				} catch (MalformedURLException e) {
 					

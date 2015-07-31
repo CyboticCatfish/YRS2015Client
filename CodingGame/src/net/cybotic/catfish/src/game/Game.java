@@ -1,10 +1,15 @@
 package net.cybotic.catfish.src.game;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -34,7 +39,7 @@ import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
 public class Game extends BasicGameState {
 	
-	private boolean editorOpen = false, loading = true, init = false, error = false, playing = false, paused = false;
+	private boolean editorOpen = false, loading = true, init = false, error = false, playing = false, paused = false, devMode = false;
 	private EditorPane currentEditor;
 	public static UnicodeFont FONT;
 	private List<GameObject> objects;
@@ -48,6 +53,7 @@ public class Game extends BasicGameState {
 	private int coins = 0;
 	private Image coin;
 	private String name, creator;
+	private String filePath;
 	
 	public class LevelLoadThread implements Runnable {
 		
@@ -79,8 +85,8 @@ public class Game extends BasicGameState {
 				
 				loading = false;
 				
-				translateX = level.getWidth() * 24;
-				translateY = level.getHeight() * 16;
+				translateX = Main.WIDTH / 2 - level.getWidth() * 16;
+				translateY = Main.HEIGHT / 2 - level.getHeight() * 16;
 				
 			} catch (HttpRequestException | ParserConfigurationException
 					| SAXException | IOException | SlickException e) {
@@ -101,6 +107,15 @@ public class Game extends BasicGameState {
 		
 	}
 	
+	public Game(String filePath, String name, String creator) {
+		
+		this.devMode = true;
+		this.name = name;
+		this.creator = creator;
+		this.filePath = filePath;
+		
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void init(GameContainer gc, StateBasedGame sbg)
@@ -236,8 +251,13 @@ public class Game extends BasicGameState {
 				g.fillRect(0, 0, gc.getWidth(), gc.getHeight());
 				g.setColor(Color.white);
 				
-				menu.render(gc, g);
-				Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 4 * 9 + 4, gc.getHeight() / 2 + 20, "MENU");
+				if (!devMode) {
+					
+					menu.render(gc, g);
+					Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 4 * 9 + 4, gc.getHeight() / 2 + 20, "MENU");
+					
+				}
+				
 				if (paused) Main.GAME_FONT.drawString(gc.getWidth() / 2 - 6 * 9 + 8, gc.getHeight() / 2 - 20, "PAUSED");
 				else if (completed) {
 					
@@ -274,7 +294,7 @@ public class Game extends BasicGameState {
 		
 		for (GameObject object : objects) {
 			
-			score += object.getScript().length();
+			if (object.isScriptable()) score += object.getScript().length();
 			
 		}
 		
@@ -429,7 +449,51 @@ public class Game extends BasicGameState {
 		
 		} else if (!init) {
 			
-			(new Thread(new LevelLoadThread(id, this))).run();
+			if (!devMode) (new Thread(new LevelLoadThread(id, this))).run();
+			
+			else {
+				
+				String XML = "", s;
+				
+				BufferedReader br;
+				try {
+					
+					br = new BufferedReader(new FileReader(new File(filePath)));
+					
+					while ((s = br.readLine()) != null) {
+						
+						XML += s;
+						
+					}
+					
+				} catch (IOException e) {
+					
+					gc.exit();
+					
+				}
+				
+				try {
+					
+					this.level = new Level(XML, this);
+					
+					objects = new ArrayList<GameObject>(level.getObjects());
+					width = level.getWidth();
+					height = level.getHeight();
+					
+					loading = false;
+					
+					translateX = Main.WIDTH / 2 - level.getWidth() * 16;
+					translateY = Main.HEIGHT / 2 - level.getHeight() * 16;
+					
+				} catch (Exception e) {
+					
+					gc.exit();
+					e.printStackTrace();
+					
+				}
+				
+			}
+			
 			init = true;
 			
 		} else if (paused && gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
@@ -472,7 +536,7 @@ public class Game extends BasicGameState {
 				
 				try {
 					
-					Main.openWebpage(new URL("https://twitter.com/intent/tweet?text=I%20just%20scored%20950%20points%20playing%20%23Code404%20on%20" + name.replaceAll(" ", "%20") + "%20by%20" + creator.replaceAll(" ", "%20") + "!!%20%23YRS2015"));
+					Main.openWebpage(new URL("https://twitter.com/intent/tweet?text=I%20just%20scored%20" + (1000 - this.getScore()) + "%20points%20playing%20%23Code404%20on%20" + name.replaceAll(" ", "%20") + "%20by%20" + creator.replaceAll(" ", "%20") + "!!%20%23YRS2015"));
 					
 				} catch (MalformedURLException e) {
 					
@@ -561,8 +625,36 @@ public class Game extends BasicGameState {
 	public void getCoin(GameContainer gc) throws SlickException {
 		
 		this.coins += 1;
-		if (coins == level.getTotalCoins()) completed = true;
-		gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(2, 0), 0, 0);
+		if (coins == level.getTotalCoins()) {
+			
+			completed = true;
+			gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(2, 0), 0, 0);
+			
+			(new Thread(new ScoreSubmitRequest())).run();
+		
+		}	
+			
+	}
+	
+
+	
+	public class ScoreSubmitRequest implements Runnable {
+
+		@Override
+		public void run() {
+			
+			Map<String, String> data = new HashMap<String, String>();
+			data.put("token", Main.LOGIN_TOKEN);
+			data.put("level_id", Integer.toString(id));
+			data.put("score", Integer.toString(1000 - getScore()));
+			
+			HttpRequest scorePost = HttpRequest.post(Main.SERVER_URL + "/level/scoreboard/submit");
+				scorePost.trustAllCerts();
+				scorePost.trustAllHosts();
+				
+			scorePost.form(data).body();
+			
+		}
 		
 	}
 	
