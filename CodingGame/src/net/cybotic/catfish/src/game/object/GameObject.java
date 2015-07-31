@@ -45,10 +45,10 @@ public abstract class GameObject {
 		
 			if (this.moving) {
 				
-				if (renderingY < y * 32 && dir == 2) renderingY += 0.1f * delta;
-				else if (renderingX > x * 32 && dir == 3) renderingX -= 0.1f * delta;
-				else if (renderingY > y * 32 && dir == 0) renderingY -= 0.1f * delta;
-				else if (renderingX < x * 32 && dir == 1) renderingX += 0.1f * delta;
+				if (renderingY < y * 32 && dir == 2) renderingY += 0.07f * delta;
+				else if (renderingX > x * 32 && dir == 3) renderingX -= 0.07f * delta;
+				else if (renderingY > y * 32 && dir == 0) renderingY -= 0.07f * delta;
+				else if (renderingX < x * 32 && dir == 1) renderingX += 0.07f * delta;
 				else {
 					
 					this.renderingX = x * 32;

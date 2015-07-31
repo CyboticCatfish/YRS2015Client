@@ -14,7 +14,7 @@ public class Wall extends GameObject {
 
 	public Wall(int x, int y, Game game) throws SlickException {
 		
-		super(x, y, 0, 0, "", false, game, "wall", true, 0);
+		super(x, y, 6, 0, "", false, game, "wall", true, 0);
 		
 		wall = Main.loadImage("res/wall.png");
 		

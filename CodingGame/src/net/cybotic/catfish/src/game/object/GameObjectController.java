@@ -13,7 +13,7 @@ public class GameObjectController {
 	
 	public void moveForward() {
 		
-		if (enabled) {
+		if (enabled && !(target instanceof Bomb)) {
 		
 			while (target.isMoving()) {
 				
@@ -37,7 +37,7 @@ public class GameObjectController {
 	
 	public void turnClockwise() {
 		
-		if (enabled) {
+		if (enabled && !(target instanceof Bomb)) {
 		
 			while (target.isMoving()) {
 				
@@ -61,7 +61,7 @@ public class GameObjectController {
 	
 	public void turnAntiClockwise() {
 		
-		if (enabled) {
+		if (enabled && !(target instanceof Bomb)) {
 		
 			while (target.isMoving()) {
 				
@@ -250,6 +250,16 @@ public class GameObjectController {
 		}
 		
 		return null;
+		
+	}
+	
+	public void explode() {
+		
+		if (enabled) {
+		
+			if (target instanceof Bomb) ((Bomb) target).explode();
+		
+		}
 		
 	}
 	

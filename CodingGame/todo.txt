@@ -1,7 +1,4 @@
 Objects to make:
- - bomb
- - sliding wall (ie pushable block)
- - ghost
  - laser
 
 Sound 
@@ -9,3 +6,6 @@ PowerPoint
 Video
 Website
 Levels
+
+Tweaks??
+Smoke??

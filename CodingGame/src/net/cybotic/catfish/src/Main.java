@@ -63,7 +63,8 @@ public class Main extends StateBasedGame {
 		}
 		
 		AppGameContainer app = new AppGameContainer(new Main());
-		app.setDisplayMode(Main.WIDTH, Main.HEIGHT, Main.FULLSCREEN);
+		//app.setDisplayMode(Main.WIDTH, Main.HEIGHT, Main.FULLSCREEN);
+		app.setDisplayMode(app.getScreenWidth(), app.getScreenHeight(), true);
 		app.setAlwaysRender(true);
 		app.setShowFPS(false);
 		app.start();

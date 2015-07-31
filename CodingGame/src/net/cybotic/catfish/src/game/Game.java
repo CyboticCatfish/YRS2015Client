@@ -201,11 +201,11 @@ public class Game extends BasicGameState {
 				
 			}
 			
-			for (int z = 0; z < 6; z++) {
-			
-				for (int x = 0; x < this.getWidth(); x++) {
+			for (int y = 0; y < this.getHeight(); y++) {
 				
-					for (int y = 0; y < this.getHeight(); y++) {
+				for (int z = 0; z < 7; z++) {
+					
+					for (int x = 0; x < this.getWidth(); x++) {
 						
 						for (GameObject object : objects) {
 							

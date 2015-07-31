@@ -17,9 +17,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import net.cybotic.catfish.src.game.object.Bomb;
 import net.cybotic.catfish.src.game.object.Coin;
 import net.cybotic.catfish.src.game.object.Door;
 import net.cybotic.catfish.src.game.object.GameObject;
+import net.cybotic.catfish.src.game.object.Ghost;
 import net.cybotic.catfish.src.game.object.PressurePlate;
 import net.cybotic.catfish.src.game.object.Robot;
 import net.cybotic.catfish.src.game.object.Wall;
@@ -78,7 +80,7 @@ public class Level {
 			if (eElement.hasAttribute("typeid")) {
 				
 				int id = Integer.parseInt(eElement.getAttribute("typeid"));
-				int x = 0, y = 0, z = 0, dir = 2, listenerLevel = 0;
+				int x = 0, y = 0, dir = 2, listenerLevel = 0;
 				boolean scriptable = false, collidable = true;
 				String script = eElement.getTextContent();
 				
@@ -86,7 +88,6 @@ public class Level {
 				if (x >= width) x = width - 1;
 				if (eElement.hasAttribute("y")) y = Integer.parseInt(eElement.getAttribute("y"));
 				if (y >= width) y = height - 1;
-				if (eElement.hasAttribute("z")) z = Integer.parseInt(eElement.getAttribute("z"));
 				if (eElement.hasAttribute("direction")) dir = Integer.parseInt(eElement.getAttribute("direction"));
 				while (dir > 3) dir -= 4;
 				if (eElement.hasAttribute("scriptable")) scriptable = Boolean.parseBoolean(eElement.getAttribute("scriptable"));
@@ -101,7 +102,9 @@ public class Level {
 					totalCoins += 1;
 					
 				} else if (id == 3) this.objects.add(new PressurePlate(x, y, game, listenerLevel));
-				 else if (id == 4) this.objects.add(new Door(x, y, dir, game, listenerLevel));
+				else if (id == 4) this.objects.add(new Door(x, y, dir, game, listenerLevel));
+				else if (id == 5) this.objects.add(new Bomb(x, y, script, scriptable, game, listenerLevel));
+				else if (id == 6) this.objects.add(new Ghost(x, y, dir, script, game));
 				
 			}
 			

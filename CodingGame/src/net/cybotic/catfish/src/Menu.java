@@ -127,7 +127,7 @@ public class Menu extends BasicGameState {
 		
 		logo = new Image("res/logo.png");
 		logo.setFilter(Image.FILTER_NEAREST);
-		logo = logo.getScaledCopy(5f);
+		logo = logo.getScaledCopy(3f);
 		
 		back = Main.loadImage("res/login.png");
 		
@@ -152,7 +152,7 @@ public class Menu extends BasicGameState {
 		
 		
 		g.setBackground(new Color(30, 36, 38));
-		g.drawImage(logo, gc.getWidth() / 2 - logo.getWidth() / 2, 40);
+		g.drawImage(logo, gc.getWidth() / 2 - logo.getWidth() / 2, 60);
 		
 		Main.GAME_FONT.drawString(gc.getWidth() / 2 - 18 * 8, 180, "YOUR SUBSCRIPTIONS");
 		
