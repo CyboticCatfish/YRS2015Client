@@ -8,6 +8,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 
 import net.cybotic.catfish.src.Main;
+import net.cybotic.catfish.src.SoundBank;
 import net.cybotic.catfish.src.game.Game;
 
 public class Bomb extends GameObject {
@@ -76,6 +77,7 @@ public class Bomb extends GameObject {
 		
 		explode.start();
 		this.exploding = true;
+		SoundBank.EXPLODE.play();
 		
 	}
 	

@@ -87,6 +87,8 @@ public class Main extends StateBasedGame {
 	@Override
 	public void initStatesList(GameContainer gc) throws SlickException {
 		
+		new SoundBank();
+		
 		GAME_FONT = new SpriteSheetFont(new SpriteSheet(Main.loadImage("res/font.png"), 16, 22), ' ');
 		GAME_FONT_2 = new SpriteSheetFont(new SpriteSheet(Main.loadImage("res/font2.png"), 16, 22), ' ');
 		CURSOR_IMAGES = new SpriteSheet(Main.loadImage("res/cursors.png"), 32, 32);

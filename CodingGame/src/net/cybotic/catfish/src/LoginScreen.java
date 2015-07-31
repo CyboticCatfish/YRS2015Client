@@ -22,7 +22,7 @@ import com.github.kevinsawicki.http.HttpRequest;
 
 public class LoginScreen extends BasicGameState {
 	
-	private Image back, errorImage;
+	private Image back, errorImage, background;;
 	private MouseOverArea user, password, go;
 	private int selected = 2;
 	private SpriteSheet sheet;
@@ -35,6 +35,8 @@ public class LoginScreen extends BasicGameState {
 	@Override
 	public void init(GameContainer gc, StateBasedGame sbg)
 			throws SlickException {
+		
+		background = new Image("res/background.png");
 		
 		back = Main.loadImage("res/login.png");
 		
@@ -62,6 +64,8 @@ public class LoginScreen extends BasicGameState {
 			throws SlickException {
 		
 		g.setBackground(new Color(30, 36, 38));
+		g.drawImage(background, 0, 0);
+		
 		g.drawImage(back, gc.getWidth() / 2 - back.getWidth() / 2, gc.getHeight() / 2 - back.getHeight() / 2);
 		
 		Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 45, gc.getHeight() / 2 - back.getHeight() / 2 + 24, "LOGIN");
@@ -136,6 +140,8 @@ public class LoginScreen extends BasicGameState {
 		}
 		
 		if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+			
+			SoundBank.CLICK.play();
 			
 			if (user.isMouseOver()) {
 				

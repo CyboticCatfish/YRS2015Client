@@ -1,10 +1,6 @@
 
 <level width="7" height="7">
-    <object x="3" y="0" type="robot">
-	
-	   object.moveForward();
-	   
-    </object>
+    <object x="3" y="0" type="robot"/>
     
     <object x="3" y="1" type="pressurePlate" listenerLevel="4"/>
     
@@ -17,9 +13,6 @@
    	<object x="6" y="3" type="wall"/>
    	
    	<object x="3" y="6" type="coin"/>
-   	
    	<object x="3" y="4" type="bomb" listenerLevel="6" scriptable="true"/>
-   	
-   	<object x="5" y="1" type="laser" listenerLevel="4"/>
    	
 </level>

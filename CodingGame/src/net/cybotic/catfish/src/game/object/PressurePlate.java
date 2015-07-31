@@ -7,11 +7,12 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 
 import net.cybotic.catfish.src.Main;
+import net.cybotic.catfish.src.SoundBank;
 import net.cybotic.catfish.src.game.Game;
 
 public class PressurePlate extends GameObject {
 	
-	private boolean active = false;
+	private boolean active = false, trigger = false;
 	private Image normal, pressed;
 
 	public PressurePlate(int x, int y, Game game, int listenerLevel) throws SlickException {
@@ -23,6 +24,8 @@ public class PressurePlate extends GameObject {
 		normal = image.getSprite(0, 0);
 		pressed = image.getSprite(1, 0);
 		
+		active = false;
+		
 	}
 
 	@Override
@@ -31,15 +34,23 @@ public class PressurePlate extends GameObject {
 		active = false;
 		
 		for (GameObject object : game.getGameObjects()) {
-			
+				
 			if (object.getX() == this.getX() && object.getY() == this.getY() && !(object instanceof PressurePlate) && !object.isDead() && object.isCollidable()) {
 				
 				active = true;
-				game.addTrigger(getListenerLevel());
+				if (!trigger) {
+					
+					game.addTrigger(getListenerLevel());
+					SoundBank.PLATE.play();
+					trigger = true;
+					
+				}
 				
 			}
-			
+		
 		}
+		
+		if (active == false) trigger = false;
 		
 	}
 

@@ -1,5 +1,6 @@
 package net.cybotic.catfish.src.game.object;
 
+import net.cybotic.catfish.src.SoundBank;
 import net.cybotic.catfish.src.game.Game;
 import net.cybotic.catfish.src.script.ScriptEnv;
 
@@ -237,9 +238,15 @@ public abstract class GameObject {
 	
 	public void die() {
 		
-		this.dead  = true;
-		this.collidable = false;
-		this.scriptable = false;
+		if (!dead) {
+			
+			SoundBank.HURT.play();
+		
+			this.dead  = true;
+			this.collidable = false;
+			this.scriptable = false;
+			
+		}
 		
 	}
 

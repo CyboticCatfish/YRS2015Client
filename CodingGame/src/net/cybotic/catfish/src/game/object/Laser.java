@@ -6,6 +6,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 
 import net.cybotic.catfish.src.Main;
+import net.cybotic.catfish.src.SoundBank;
 import net.cybotic.catfish.src.game.Game;
 
 public class Laser extends GameObject {
@@ -80,7 +81,9 @@ public class Laser extends GameObject {
 	public void trigger() {
 		
 		if (!shooting) {
-		
+			
+			SoundBank.LASER.play();
+			
 			shooting = true;
 			cool = 0f;
 			

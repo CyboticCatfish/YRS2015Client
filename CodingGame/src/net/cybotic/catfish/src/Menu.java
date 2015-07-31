@@ -31,7 +31,7 @@ import com.github.kevinsawicki.http.HttpRequest;
 
 public class Menu extends BasicGameState {
 	
-	private Image logo, back;
+	private Image logo, back, background;
 	private boolean loading = true;
 	private int selected = 0;
 	private MouseOverArea left, right, play, mute, exit, levels;
@@ -120,6 +120,8 @@ public class Menu extends BasicGameState {
 	public void init(GameContainer gc, StateBasedGame sbg)
 			throws SlickException {
 		
+		background = new Image("res/background.png");
+		
 		x = gc.getWidth();
 		loadingThread = new MenuLoadingThread();
 		
@@ -152,6 +154,8 @@ public class Menu extends BasicGameState {
 		
 		
 		g.setBackground(new Color(30, 36, 38));
+		g.drawImage(background, 0, 0);
+		
 		g.drawImage(logo, gc.getWidth() / 2 - logo.getWidth() / 2, 60);
 		
 		Main.GAME_FONT.drawString(gc.getWidth() / 2 - 18 * 8, 180, "YOUR SUBSCRIPTIONS");
@@ -216,6 +220,8 @@ public class Menu extends BasicGameState {
 		}
 		
 		if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+			
+			SoundBank.CLICK.play();
 			
 			if (mute.isMouseOver()) {
 				

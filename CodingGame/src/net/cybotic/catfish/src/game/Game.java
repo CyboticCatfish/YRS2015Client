@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.cybotic.catfish.src.Main;
+import net.cybotic.catfish.src.SoundBank;
 import net.cybotic.catfish.src.game.editor.EditorKeyListener;
 import net.cybotic.catfish.src.game.editor.EditorPane;
 import net.cybotic.catfish.src.game.object.GameObject;
@@ -385,6 +386,8 @@ public class Game extends BasicGameState {
 				
 			} else if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
 				
+				SoundBank.CLICK.play();
+				
 				if (this.currentEditor != null) this.currentEditor.checkExit(gc);
 				
 				if (play.isMouseOver() && !playing) {
@@ -616,13 +619,15 @@ public class Game extends BasicGameState {
 		
 		for (GameObject object : objects) {
 			
-			if (object.getListenerLevel() == triggerLevel) object.trigger();
+			if (object.getListenerLevel() == triggerLevel && !object.isDead()) object.trigger();
 			
 		}
 		
 	}
 	
 	public void getCoin(GameContainer gc) throws SlickException {
+		
+		SoundBank.COIN.play();
 		
 		this.coins += 1;
 		if (coins == level.getTotalCoins()) {
