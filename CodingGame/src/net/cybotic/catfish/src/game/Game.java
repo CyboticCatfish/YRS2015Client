@@ -49,12 +49,13 @@ public class Game extends BasicGameState {
 	private Level level;
 	private int width, height, id = 0;
 	private SpriteSheet tiles;
-	private MouseOverArea play, stop, failed, pause, menu, tweet, scores;
+	private MouseOverArea play, stop, failed, pause, menu, tweet, scores, help;
 	private boolean errorCursor = false, completed = false, arrowUp = true;
 	private int coins = 0;
 	private Image coin, arrow;
 	private String name, creator;
 	private String filePath;
+	private Image errorImage;
 	
 	public class LevelLoadThread implements Runnable {
 		
@@ -122,6 +123,8 @@ public class Game extends BasicGameState {
 	public void init(GameContainer gc, StateBasedGame sbg)
 			throws SlickException {
 		
+		errorImage = Main.loadImage("res/error2.png");
+		
 		lastMouseX = gc.getInput().getAbsoluteMouseX();
 		lastMouseY = gc.getInput().getAbsoluteMouseY();
 		
@@ -144,6 +147,8 @@ public class Game extends BasicGameState {
 			play.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 1));
 		stop = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 2), 44, gc.getHeight() - 40);
 			stop.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 2));
+		help = new MouseOverArea(gc, Main.BIG_BUTTON.getSprite(0, 0), 84, gc.getHeight() - 40);
+			help.setMouseDownImage(Main.BIG_BUTTON.getSprite(0, 1));
 		failed = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 3), gc.getWidth() / 2 - 16, gc.getHeight() / 2 + 40);
 			failed.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 3));
 		pause = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 0), 8, 8);
@@ -248,6 +253,14 @@ public class Game extends BasicGameState {
 					
 				}
 			
+			} else {
+				
+				for (GameObject object : objects) {
+					
+					if (object.isErrored()) g.drawImage(errorImage, object.getX() * 32 + 8, object.getY() * 32 + 8);
+					
+				}
+				
 			}
 			
 			g.resetTransform();
@@ -258,6 +271,9 @@ public class Game extends BasicGameState {
 			
 			play.render(gc, g);
 			stop.render(gc, g);
+			help.render(gc, g);
+			
+			Main.GAME_FONT_2.drawString(88 + 64 - 4 * 9, gc.getHeight() - 36, "HELP");
 			
 			if (this.currentEditor != null) currentEditor.render(gc, g);
 			
@@ -353,7 +369,7 @@ public class Game extends BasicGameState {
 			
 			boolean cursorChange = false;
 			
-			if (play.isMouseOver() | stop.isMouseOver() | pause.isMouseOver()) {
+			if (play.isMouseOver() | stop.isMouseOver() | pause.isMouseOver() | help.isMouseOver()) {
 				
 				cursorChange = true;
 				if (cursorMode != 2) gc.setMouseCursor(Main.CURSOR_IMAGES.getSprite(2, 0), 0, 0);
@@ -482,6 +498,18 @@ public class Game extends BasicGameState {
 					pause.setNormalImage(Main.USEFUL_BUTTONS.getSprite(0, 1));
 					pause.setMouseOverImage(Main.USEFUL_BUTTONS.getSprite(0, 1));
 					pause.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 1));
+					
+				} else if (help.isMouseOver()) {
+					
+					try {
+						
+						Main.openWebpage(new URL(Main.SERVER_URL + "/docs"));
+						
+					} catch (MalformedURLException e) {
+						
+						e.printStackTrace();
+						
+					}
 					
 				}
 				

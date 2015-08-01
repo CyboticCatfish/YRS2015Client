@@ -21,7 +21,6 @@
 <object x="2" y="7" type="coin"/>
 
 <object type="robot" scriptable="true" x="2" y="1">
-
 /*Ghosts kill robots so make sure to evade them some how...*/
 
 </object>

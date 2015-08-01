@@ -176,6 +176,8 @@ public class Menu extends BasicGameState {
 			g.drawImage(subscriptions.get(selected).getImage(), gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 68);
 			add.render(gc, g);
 			
+			Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 150 + 8, gc.getHeight() / 2 + 100 - 12, (selected + 1) + "/" + this.subscriptions.size());
+			
 		}
 		
 		right.render(gc, g);

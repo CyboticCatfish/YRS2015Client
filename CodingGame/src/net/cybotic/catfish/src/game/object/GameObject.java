@@ -18,6 +18,7 @@ public abstract class GameObject {
 	private String script, name;
 	Game game;
 	private boolean dead = false;
+	private boolean errored = false;
 	
 	public GameObject(int x, int y, int z, int dir, String script, boolean scriptable, Game game, String name, boolean collidable, int listenerLevel) {
 		
@@ -48,8 +49,8 @@ public abstract class GameObject {
 				
 				if (renderingY < y * 32 && dir == 2) renderingY += 0.07f * delta;
 				else if (renderingX > x * 32 && dir == 3) renderingX -= 0.07f * delta;
-				else if (renderingY > y * 32 && dir == 0) renderingY -= 0.07f * delta;
-				else if (renderingX < x * 32 && dir == 1) renderingX += 0.07f * delta;
+				else if (renderingY >  y * 32 && dir == 0) renderingY -= 0.07f * delta;
+				else if (renderingX <  x * 32 && dir == 1) renderingX += 0.07f * delta;
 				else {
 					
 					this.renderingX = x * 32;
@@ -79,7 +80,7 @@ public abstract class GameObject {
 	public void runScript() {
 		
 		if (!scriptRunning) {
-		
+			
 			scriptEnv.launchScript();
 			scriptRunning = true;
 			
@@ -126,30 +127,35 @@ public abstract class GameObject {
 		if (dir == 0) {
 			
 			if (y > 0 && !collidableObjectToFront()) y -= 1;
+			else moving = false;
 			
 		} else if (dir == 1) {
 			
-			if (x < game.getWidth() - 1 && !collidableObjectToFront()) x += 1;
+			if (x < game.getWidth() && !collidableObjectToFront()) x += 1;
+			else moving = false;
 			
 		} else if (dir == 2) {
 			
-			if (y < game.getHeight() - 1 && !collidableObjectToFront()) y += 1;
+			if (y < game.getHeight() && !collidableObjectToFront()) y += 1;
+			else moving = false;
 			
 		} else if (dir == 3) {
 			
 			if (x > 0 && !collidableObjectToFront()) x -= 1;
+			else moving = false;
 			
-		} else moving = false;
+		}
+		
 	}
 	
 	private boolean collidableObjectToFront() {
 		
 		for (GameObject object : game.getGameObjects()) {
 			
-			if (dir == 0 && object.getX() == this.getX() && object.collidable && object.getY() == this.getY() - 1) return true;
-			else if (dir == 1 && object.getX() == this.getX() + 1 && object.collidable && object.getY() == this.getY()) return true;
-			else if (dir == 2 && object.getX() == this.getX() && object.collidable && object.getY() == this.getY() + 1) return true;
-			else if (dir == 3 && object.getX() == this.getX() - 1 && object.collidable && object.getY() == this.getY()) return true;
+			if (dir == 0 && object.getX() == this.getX() && object.collidable && object.getY() == this.getY() - 1 && !object.dead) return true;
+			else if (dir == 1 && object.getX() == this.getX() + 1 && object.collidable && object.getY() == this.getY() && !object.dead) return true;
+			else if (dir == 2 && object.getX() == this.getX() && object.collidable && object.getY() == this.getY() + 1 && !object.dead) return true;
+			else if (dir == 3 && object.getX() == this.getX() - 1 && object.collidable && object.getY() == this.getY() && !object.dead) return true;
 			
 		}
 		 
@@ -283,6 +289,18 @@ public abstract class GameObject {
 	public boolean isWaiting() {
 		
 		return this.waiting;
+		
+	}
+
+	public void error() {
+		
+		this.errored = true;
+		
+	}
+
+	public boolean isErrored() {
+		
+		return this.errored;
 		
 	}
 	

@@ -1,6 +1,5 @@
 package net.cybotic.catfish.src.script;
 
-import java.io.IOException;
 import java.io.StringReader;
 
 import net.cybotic.catfish.src.game.object.GameObject;
@@ -57,8 +56,10 @@ public class ScriptEnv {
 				executable.exec(context, scope);
 				target.scriptComplete();
 				
-			} catch (IOException e) {
+			} catch (Exception e) {
 				
+				target.scriptComplete();
+				controller.error();
 				e.printStackTrace();
 				
 			}

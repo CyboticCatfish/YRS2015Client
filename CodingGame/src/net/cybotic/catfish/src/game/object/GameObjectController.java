@@ -301,4 +301,20 @@ public class GameObjectController {
 		
 	}
 	
+	public void moveForward(int j) {
+		
+		for (int i = 0; i < j; i++) {
+			
+			target.moveForward();
+			
+		}
+		
+	}
+
+	public void error() {
+		
+		if (!target.isErrored()) this.target.error();
+		
+	}
+	
 }

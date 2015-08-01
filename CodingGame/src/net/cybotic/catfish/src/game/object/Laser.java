@@ -195,9 +195,9 @@ public class Laser extends GameObject {
 		}
 		
 		if (cool > 40f) {
-	
+		
 			for (GameObject object : game.getGameObjects()) {
-				
+					
 				if ((object.getX() == this.getX() | object.getY() == this.getY()) && !(object instanceof Wall) && object.collidable && !(object.equals(this)) && !object.isDead()) {
 					
 					object.die();

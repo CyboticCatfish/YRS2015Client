@@ -5,9 +5,9 @@
 	Try typing object.moveForward(); here
 	Then click the run button in the bottom left
 	To reset the level press the stop button*/
-	
-		
-	
+
+
+
 	/*To complete the level you will need to collect the coin
 	To get past the wall try using object.turnClockwise(); and
 	object.turnAntiClockwise();*/

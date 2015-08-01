@@ -51,9 +51,17 @@ public class EditorPane {
 		
 		String start = currentScript.get(currentLine).substring(0, cursorPosition);
 		String end = currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length());
+		
+		if (character == ')' && end.startsWith(")")) {
+		
+			cursorPosition += 1;
+		
+		} else {
 			
-		currentScript.set(currentLine, start + character + end);
-		cursorPosition += 1;
+			currentScript.set(currentLine, start + character + end);
+			cursorPosition += 1;
+			
+		}
 		
 	}
 	
@@ -182,17 +190,50 @@ public class EditorPane {
 		
 		}
 		
+		for (int i = 0; i < this.currentScript.size(); i++) {
+			
+			if (this.currentScript.get(i).contains("=new ") | this.currentScript.get(i).contains(" new ") | this.currentScript.get(i).contains("(new ") | this.currentScript.get(i).contains("import(")) {
+				
+				currentScript.remove(i);
+				currentScript.add(i, "");
+				cursorPosition = 0;
+				
+			}
+			
+		}
+		
+		this.getTarget().setScript(getCurrentScript());
+		
 	}
 
 	public void newLine() {
 		
-		if (currentScript.size() < 42) {
+		if (currentScript.get(currentLine).length() > this.cursorPosition) {
 		
-			currentScript.add(currentLine + 1, currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length()));
-			currentScript.set(currentLine, currentScript.get(currentLine).substring(0, cursorPosition));
-			currentLine += 1;
-			cursorPosition = 0;
+			if (currentScript.get(currentLine).charAt(cursorPosition - 1) == '{' && currentScript.get(currentLine).charAt(cursorPosition) == '}') {
+					
+				currentScript.add(currentLine + 1, currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length()));
+				currentScript.set(currentLine, currentScript.get(currentLine).substring(0, cursorPosition));
+				currentLine += 1;
+				cursorPosition = 0;
+				currentScript.add(currentLine + 1, currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length()));
+				currentScript.set(currentLine, currentScript.get(currentLine).substring(0, cursorPosition));
+				
+				cursorPosition = 0;
+				this.currentScript.set(currentLine, "   ");
+				cursorPosition = 3;
+					
+	
+			} 
 		
+		} else if (currentScript.size() < 42) {
+		
+				currentScript.add(currentLine + 1, currentScript.get(currentLine).substring(cursorPosition, currentScript.get(currentLine).length()));
+				currentScript.set(currentLine, currentScript.get(currentLine).substring(0, cursorPosition));
+				currentLine += 1;
+				
+				cursorPosition = 0;
+
 		}
 		
 	}
