@@ -1,6 +1,8 @@
 package net.cybotic.catfish.src;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,8 +24,8 @@ import com.github.kevinsawicki.http.HttpRequest;
 
 public class LoginScreen extends BasicGameState {
 	
-	private Image back, errorImage, background;;
-	private MouseOverArea user, password, go;
+	private Image back, errorImage, background;
+	private MouseOverArea user, password, go, register;
 	private int selected = 2;
 	private SpriteSheet sheet;
 	private String userString = "", passwordString = "", pretendPasswordString = "";
@@ -50,6 +52,8 @@ public class LoginScreen extends BasicGameState {
 			password.setMouseDownImage(sheet.getSprite(0, 1));
 		go = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 1), gc.getWidth() / 2 + back.getWidth() / 2 - 40, gc.getHeight() / 2 + back.getHeight() / 2 - 40);
 			go.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 1));
+		register = new MouseOverArea(gc, Main.BIG_BUTTON.getSprite(0, 0), 4, gc.getHeight() - 40);
+			register.setMouseDownImage(Main.BIG_BUTTON.getSprite(0, 1));
 		
 		errorImage = Main.loadImage("res/error.png");
 		
@@ -73,6 +77,9 @@ public class LoginScreen extends BasicGameState {
 		user.render(gc, g);
 		password.render(gc, g);
 		go.render(gc, g);
+		register.render(gc, g);
+		
+		Main.GAME_FONT_2.drawString(4 + 70 - 6 * 9, gc.getHeight() - 36, "SIGNUP");
 		
 		if (userString.length() == 0) Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 128 + 6, gc.getHeight() / 2 - back.getHeight() / 2 + 71, "USERNAME", new Color(255, 255, 255, 50));
 		else Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 128 + 6, gc.getHeight() / 2 - back.getHeight() / 2 + 71, userString);
@@ -158,6 +165,18 @@ public class LoginScreen extends BasicGameState {
 			}  else if (go.isMouseOver()) {
 				
 				submit();
+				
+			} else if (register.isMouseOver()) {
+				
+				try {
+					
+					Main.openWebpage(new URL(Main.SERVER_URL + "/signup"));
+					
+				} catch (MalformedURLException e) {
+					
+					e.printStackTrace();
+					
+				}
 				
 			}
 			

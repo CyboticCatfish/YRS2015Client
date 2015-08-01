@@ -1,0 +1,23 @@
+<level width="3" height="7">
+
+	<object type="robot" scriptable="true" x="1" y="1">
+	/*Here you can write code to control the objects in the game
+	Try typing object.moveForward(); here
+	Then click the run button in the bottom left
+	To reset the level press the stop button*/
+	
+		
+	
+	/*To complete the level you will need to collect the coin
+	To get past the wall try using object.turnClockwise(); and
+	object.turnAntiClockwise();*/
+	</object>
+	<object type="coin" x="1" y="5"/>
+	
+	<object type="wall" x="1" y="3"/>
+
+</level>
+
+
+	
+	

@@ -34,7 +34,7 @@ public class Menu extends BasicGameState {
 	private Image logo, back, background;
 	private boolean loading = true;
 	private int selected = 0;
-	private MouseOverArea left, right, play, mute, exit, levels;
+	private MouseOverArea left, right, play, mute, exit, levels, add;
 	private List<LevelCard> subscriptions;
 	private MenuLoadingThread loadingThread;
 	private boolean muted = false, init = false;
@@ -63,7 +63,7 @@ public class Menu extends BasicGameState {
 				
 				List<Integer> levelIDs = new ArrayList<Integer>();
 				
-				for (String id : subscribed.split(",")) {
+				for (String id : (new String("1,2,3," + subscribed)).split(",")) {
 					
 					levelIDs.add(Integer.parseInt(id));
 					
@@ -141,6 +141,8 @@ public class Menu extends BasicGameState {
 			left.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 1).getFlippedCopy(true, false));
 		right = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 1), gc.getWidth() / 2 + 158, gc.getHeight() / 2 + 4);
 			right.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 1));
+		add = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 6), gc.getWidth() / 2 + back.getWidth() / 2 - 40, gc.getHeight() / 2 + back.getHeight() / 2 - 20);
+			add.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 6));
 			
 		play = new MouseOverArea(gc, Main.BIG_BUTTON.getSprite(0, 0), gc.getWidth() / 2 - 64, gc.getHeight() / 2 + back.getHeight() / 2 + 52);
 			play.setMouseDownImage(Main.BIG_BUTTON.getSprite(0, 1));
@@ -172,6 +174,7 @@ public class Menu extends BasicGameState {
 			Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 24, subscriptions.get(selected).getName().toUpperCase());
 			Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 44, "BY " + subscriptions.get(selected).getCreator().toUpperCase());
 			g.drawImage(subscriptions.get(selected).getImage(), gc.getWidth() / 2 - 150 + 4, gc.getHeight() / 2 - 100 + 68);
+			add.render(gc, g);
 			
 		}
 		
@@ -276,7 +279,19 @@ public class Menu extends BasicGameState {
 				
 				try {
 					
-					Main.openWebpage(new URL("http://c404.mrmindimplosion.co.uk:5000?token=" + Main.LOGIN_TOKEN));
+					Main.openWebpage(new URL(Main.SERVER_URL + "?token=" + Main.LOGIN_TOKEN));
+					
+				} catch (MalformedURLException e) {
+					
+					e.printStackTrace();
+					
+				}
+				
+			} else if (add.isMouseOver() && !loading) {
+				
+				try {
+					
+					Main.openWebpage(new URL(Main.SERVER_URL + "/submit?token=" + Main.LOGIN_TOKEN));
 					
 				} catch (MalformedURLException e) {
 					

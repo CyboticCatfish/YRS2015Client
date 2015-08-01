@@ -5,6 +5,7 @@ import java.io.StringReader;
 
 import net.cybotic.catfish.src.game.object.GameObject;
 import net.cybotic.catfish.src.game.object.GameObjectController;
+import net.cybotic.catfish.src.game.object.LevelController;
 
 import org.mozilla.javascript.*;
 
@@ -46,7 +47,8 @@ public class ScriptEnv {
 			controller = new GameObjectController(target);
 			
             scope.put("object", scope, controller);
-
+            scope.put("level", scope, new LevelController(target.getGame()));
+            
             Script executable;
 			
             try {

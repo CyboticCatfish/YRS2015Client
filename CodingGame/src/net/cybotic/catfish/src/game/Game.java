@@ -45,14 +45,14 @@ public class Game extends BasicGameState {
 	public static UnicodeFont FONT;
 	private List<GameObject> objects;
 	private int cursorMode = 1;
-	private float translateX = 0f, translateY = 0f, lastMouseX, lastMouseY;
+	private float translateX = 0f, translateY = 0f, lastMouseX, lastMouseY, arrowCool = 0f;
 	private Level level;
 	private int width, height, id = 0;
 	private SpriteSheet tiles;
-	private MouseOverArea play, stop, failed, pause, menu, tweet;
-	private boolean errorCursor = false, completed = false;
+	private MouseOverArea play, stop, failed, pause, menu, tweet, scores;
+	private boolean errorCursor = false, completed = false, arrowUp = true;
 	private int coins = 0;
-	private Image coin;
+	private Image coin, arrow;
 	private String name, creator;
 	private String filePath;
 	
@@ -148,6 +148,7 @@ public class Game extends BasicGameState {
 			failed.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 3));
 		pause = new MouseOverArea(gc, Main.USEFUL_BUTTONS.getSprite(0, 0), 8, 8);
 			pause.setMouseDownImage(Main.USEFUL_BUTTONS.getSprite(1, 0));
+			
 		menu = new MouseOverArea(gc, Main.BIG_BUTTON.getSprite(0, 0), gc.getWidth() / 2 - 64, gc.getHeight() / 2 + 16);
 			menu.setMouseDownImage(Main.BIG_BUTTON.getSprite(0, 1));
 			
@@ -155,8 +156,12 @@ public class Game extends BasicGameState {
 		
 		tweet = new MouseOverArea(gc, sheet.getSprite(0, 0), gc.getWidth() / 2 - 64, gc.getHeight() / 2 + 56);
 			tweet.setMouseDownImage(sheet.getSprite(0, 1));
+		scores = new MouseOverArea(gc, Main.BIG_BUTTON.getSprite(0, 0), gc.getWidth() / 2 - 64, gc.getHeight() / 2 + 96);
+			scores.setMouseDownImage(Main.BIG_BUTTON.getSprite(0, 1));
 	
 		coins = 0;
+		
+		arrow = Main.loadImage("res/arrow.png");
 		
 	}
 
@@ -235,6 +240,16 @@ public class Game extends BasicGameState {
 			
 			}
 			
+			if (!playing) {
+			
+				for (GameObject object : objects) {
+					
+					if (object.isScriptable()) g.drawImage(arrow, object.getX() * 32 + 11, object.getY() * 32 - 20 + arrowCool);
+					
+				}
+			
+			}
+			
 			g.resetTransform();
 			
 			Main.GAME_FONT.drawString(gc.getWidth() / 2 - Main.GAME_FONT.getWidth(coins + "/" + level.getTotalCoins()) / 2, 50, coins + "/" + level.getTotalCoins());
@@ -267,6 +282,13 @@ public class Game extends BasicGameState {
 					
 					tweet.render(gc, g);
 					Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 5 * 9 + 4, gc.getHeight() / 2 + 60, "TWEET");
+					
+					if (!devMode) {
+						
+						scores.render(gc, g);
+						Main.GAME_FONT_2.drawString(gc.getWidth() / 2 - 6 * 9 + 4, gc.getHeight() / 2 + 100, "SCORES");
+					
+					}
 					
 				}
 				
@@ -308,6 +330,24 @@ public class Game extends BasicGameState {
 			throws SlickException {
 		
 		if (!loading && !paused && !completed) {
+			
+			if (!playing) {
+				
+				if (arrowUp) {
+					
+					arrowCool += 0.01f * delta;
+					
+					if (arrowCool > 4f) arrowUp = false;
+					
+				} else {
+					
+					arrowCool -= 0.01f * delta;
+					
+					if (arrowCool < 0f) arrowUp = true;
+					
+				}
+				
+			}
 		
 			if (this.currentEditor != null) currentEditor.update(gc, delta);
 			
@@ -465,7 +505,7 @@ public class Game extends BasicGameState {
 					
 					while ((s = br.readLine()) != null) {
 						
-						XML += s;
+						XML += s + "\n";
 						
 					}
 					
@@ -525,11 +565,15 @@ public class Game extends BasicGameState {
 			
 			if (gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON) && failed.isMouseOver()) {
 				
+				SoundBank.CLICK.play();
+				
 				sbg.enterState(2, new FadeOutTransition(), new FadeInTransition());
 				
 			}
 			
 		} else if (completed && gc.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+			
+			SoundBank.CLICK.play();
 			
 			if (menu.isMouseOver()) {
 				
@@ -540,6 +584,18 @@ public class Game extends BasicGameState {
 				try {
 					
 					Main.openWebpage(new URL("https://twitter.com/intent/tweet?text=I%20just%20scored%20" + (1000 - this.getScore()) + "%20points%20playing%20%23Code404%20on%20" + name.replaceAll(" ", "%20") + "%20by%20" + creator.replaceAll(" ", "%20") + "!!%20%23YRS2015"));
+					
+				} catch (MalformedURLException e) {
+					
+					e.printStackTrace();
+					
+				}
+				
+			} else if (scores.isMouseOver() && !devMode) {
+				
+				try {
+					
+					Main.openWebpage(new URL(Main.SERVER_URL + "/level?id=" + this.id));
 					
 				} catch (MalformedURLException e) {
 					
@@ -660,6 +716,12 @@ public class Game extends BasicGameState {
 			scorePost.form(data).body();
 			
 		}
+		
+	}
+
+	public int getCurrentCoins() {
+		
+		return this.coins;
 		
 	}
 	

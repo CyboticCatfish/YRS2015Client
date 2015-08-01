@@ -1,0 +1,53 @@
+<level width="7" height="4">
+
+<object type="wall" x="1" y="0"/>
+<object type="wall" x="1" y="1"/>
+<object type="wall" x="1" y="3"/>
+
+<object type="wall" x="5" y="0"/>
+<object type="wall" x="5" y="1"/>
+<object type="wall" x="5" y="2"/>
+<object type="wall" x="5" y="3"/>
+
+<object type="wall" x="2" y="1"/>
+<object type="wall" x="2" y="3"/>
+<object type="wall" x="3" y="1"/>
+<object type="wall" x="3" y="2"/>
+<object type="wall" x="3" y="3"/>
+
+<object type="bomb" x="2" y="2" listenerLevel="1"/>
+<object type="pressurePlate" x="4" y="3" listenerLevel="1"/>
+
+<object type="laser" x="1" y="2" listenerLevel="2"/>
+<object type="pressurePlate" x="0" y="2" listenerLevel="2"/>
+
+<object type="door" direction="0" x="4" y="1" listenerLevel="3"/>
+<object type="pressurePlate" x="6" y="3" listenerLevel="3"/>
+
+<object x="4" y="0" type="coin"/>
+<object x="0" y="3" type="coin"/>
+<object x="6" y="2" type="coin"/>
+
+<object type="robot" scriptable="true" x="0" y="0">
+/*HINT: Try using the object.suspend(); command
+You have to put a number in the brackets also
+The number in the brackets is the number 
+of seconds to sleep*/
+
+</object>
+<object type="robot" scriptable="true" x="2" y="0" direction="1">
+/*HINT: Try using the object.suspend(); command
+You have to put a number in the brackets also
+The number in the brackets is the number 
+of seconds to sleep*/
+
+</object>
+<object type="robot" scriptable="true" x="6" y="0">
+/*HINT: Try using the object.suspend(); command
+You have to put a number in the brackets also
+The number in the brackets is the number 
+of seconds to sleep*/
+
+</object>
+
+</level>

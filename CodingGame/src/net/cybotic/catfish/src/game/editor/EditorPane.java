@@ -29,7 +29,13 @@ public class EditorPane {
 	public EditorPane(Game game, GameObject target, GameContainer gc) throws SlickException {
 		
 		String[] script = target.getScript().split("\n");
-		for (int i = 0; i < script.length; i++) currentScript.add(script[i]);
+		
+		for (int i = 0; i < script.length; i++) {
+			
+			currentScript.add(script[i]);
+		}
+		
+		target.setScript(this.getCurrentScript());
 		
 		this.game = game;
 		this.object = target;

@@ -10,9 +10,9 @@ import org.newdawn.slick.SlickException;
 
 public abstract class GameObject {
 	
-	private int x, y, z = 0, dir, listenerLevel = 0;
+	private int x, y, z = 0, dir, listenerLevel = 0, targetWait, waitTime = 0;
 	private float renderingX, renderingY;
-	private boolean moving = false, scriptRunning = false, scriptable = false;
+	private boolean moving = false, scriptRunning = false, scriptable = false, waiting = false;
 	protected boolean collidable = false;
 	private ScriptEnv scriptEnv;
 	private String script, name;
@@ -56,6 +56,15 @@ public abstract class GameObject {
 					this.renderingY = y * 32;
 					
 					moving = false;
+					
+				}
+				
+			} else if (this.waiting) {
+				
+				waitTime += delta;
+				if (waitTime > targetWait) {
+					
+					waiting = false;
 					
 				}
 				
@@ -259,6 +268,21 @@ public abstract class GameObject {
 	public void setZ(int z) {
 		
 		this.z = z;
+		
+	}
+
+	public void startWaiting(int targetWait) {
+		
+		waiting = true;
+		
+		this.targetWait = targetWait;
+		this.waitTime = 0;
+		
+	}
+
+	public boolean isWaiting() {
+		
+		return this.waiting;
 		
 	}
 	

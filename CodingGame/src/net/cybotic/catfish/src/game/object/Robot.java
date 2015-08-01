@@ -12,9 +12,9 @@ public class Robot extends GameObject {
 	
 	private SpriteSheet robot;
 
-	public Robot(int x, int y, int dir, String script, Game game, boolean collidable) throws SlickException {
+	public Robot(int x, int y, int dir, String script, boolean scriptable, Game game) throws SlickException {
 		
-		super(x, y, 5, dir, script, true, game, "robot", collidable, 0);
+		super(x, y, 5, dir, script, scriptable, game, "robot", true, 0);
 		
 		robot = new SpriteSheet(Main.loadImage("res/robot.png"), 48, 48);
 		

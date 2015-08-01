@@ -82,20 +82,19 @@ public class Level {
 				
 				String type = eElement.getAttribute("type");
 				int x = 0, y = 0, dir = 2, listenerLevel = 0;
-				boolean scriptable = false, collidable = true;
+				boolean scriptable = false;
 				String script = eElement.getTextContent();
 				
 				if (eElement.hasAttribute("x")) x = Integer.parseInt(eElement.getAttribute("x"));
 				if (x >= width) x = width - 1;
 				if (eElement.hasAttribute("y")) y = Integer.parseInt(eElement.getAttribute("y"));
-				if (y >= width) y = height - 1;
+				if (y >= height) y = height - 1;
 				if (eElement.hasAttribute("direction")) dir = Integer.parseInt(eElement.getAttribute("direction"));
 				while (dir > 3) dir -= 4;
 				if (eElement.hasAttribute("scriptable")) scriptable = Boolean.parseBoolean(eElement.getAttribute("scriptable"));
-				if (eElement.hasAttribute("collidable")) collidable = Boolean.parseBoolean(eElement.getAttribute("collidable"));
 				if (eElement.hasAttribute("listenerLevel")) listenerLevel = Integer.parseInt(eElement.getAttribute("listenerLevel"));
 				
-				if (type.equals("robot")) this.objects.add(new Robot(x, y, dir, script, game, collidable));
+				if (type.equals("robot")) this.objects.add(new Robot(x, y, dir, script, scriptable, game));
 				else if (type.equals("wall")) this.objects.add(new Wall(x, y, game));
 				else if (type.equals("coin")) {
 					

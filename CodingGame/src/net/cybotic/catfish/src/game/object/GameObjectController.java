@@ -15,7 +15,7 @@ public class GameObjectController {
 		
 		if (enabled && !(target instanceof Bomb)) {
 		
-			while (target.isMoving()) {
+			while (target.isMoving() | target.isWaiting()) {
 				
 				try {
 					
@@ -39,7 +39,7 @@ public class GameObjectController {
 		
 		if (enabled && !(target instanceof Bomb)) {
 		
-			while (target.isMoving()) {
+			while (target.isMoving() | target.isWaiting()) {
 				
 				try {
 					
@@ -63,7 +63,7 @@ public class GameObjectController {
 		
 		if (enabled && !(target instanceof Bomb)) {
 		
-			while (target.isMoving()) {
+			while (target.isMoving() | target.isWaiting()) {
 				
 				try {
 					
@@ -259,6 +259,30 @@ public class GameObjectController {
 		
 			if (target instanceof Bomb) ((Bomb) target).explode();
 		
+		}
+		
+	}
+	
+	public void suspend(int time) {
+		
+		if (enabled) {
+			
+			while (target.isMoving() | target.isWaiting()) {
+		
+				try {
+					
+					Thread.sleep(50);
+					
+				} catch (InterruptedException e) {
+					
+					e.printStackTrace();
+					
+				}
+				
+			}
+			
+			target.startWaiting(time * 1000);
+			
 		}
 		
 	}
