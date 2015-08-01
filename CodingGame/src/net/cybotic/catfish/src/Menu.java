@@ -63,7 +63,7 @@ public class Menu extends BasicGameState {
 				
 				List<Integer> levelIDs = new ArrayList<Integer>();
 				
-				for (String id : (new String("1,2,3," + subscribed)).split(",")) {
+				for (String id : (new String("1,2,3,4," + subscribed)).split(",")) {
 					
 					levelIDs.add(Integer.parseInt(id));
 					
