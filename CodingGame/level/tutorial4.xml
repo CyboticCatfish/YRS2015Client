@@ -1,0 +1,37 @@
+<level width="5" height="10">
+
+<object type="wall" x="0" y="2"/>
+<object type="wall" x="1" y="2"/>
+<object type="wall" x="3" y="2"/>
+<object type="wall" x="4" y="2"/>
+
+<object type="wall" x="1" y="4"/>
+<object type="wall" x="1" y="5"/>
+<object type="wall" x="1" y="6"/>
+<object type="wall" x="3" y="4"/>
+<object type="wall" x="3" y="5"/>
+<object type="wall" x="3" y="6"/>
+
+<object type="bomb" x="1" y="3" scriptable="true">
+/*User object.explode() to cause the bomb to explode*/
+</object>
+<object type="bomb" x="3" y="3" scriptable="true">
+/*User object.explode() to cause the bomb to explode*/
+</object>
+<object x="2" y="7" type="coin"/>
+
+<object type="robot" scriptable="true" x="2" y="1">
+
+/*Ghosts kill robots so make sure to evade them some how...*/
+
+</object>
+
+<object type="ghost" x="2" y="8" direction="0">
+while (true) {
+	
+	object.moveForward();
+
+}
+</object>
+
+</level>

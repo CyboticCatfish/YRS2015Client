@@ -12,7 +12,7 @@ import net.cybotic.catfish.src.game.Game;
 public class Laser extends GameObject {
 
 	private SpriteSheet sheet;
-	private boolean shooting = false, killed = false;
+	private boolean shooting = false;
 	private float cool = 0f;
 	private int minX, minY, maxX, maxY;
 	
@@ -27,6 +27,9 @@ public class Laser extends GameObject {
 		minY = this.getY() - 1;
 		maxY = this.getY() + 1;
 		
+		cool = 0f;
+		shooting = false;
+		
 	}
 
 	@Override
@@ -34,6 +37,7 @@ public class Laser extends GameObject {
 		
 		if (shooting) {
 			
+			this.trigger();
 			cool += 0.1f * delta;
 			if (cool > 100f) {
 				
@@ -49,7 +53,7 @@ public class Laser extends GameObject {
 	@Override
 	public void render(GameContainer gc, Graphics g) {
 		
-		if (shooting) {
+		if (shooting && cool > 40f) {
 			
 			for (int i = minX; i < maxX; i++) {
 				
@@ -65,8 +69,8 @@ public class Laser extends GameObject {
 			
 		}
 		
-		if (!shooting) g.drawImage(sheet.getSprite(0, 0), this.getRenderingX(), this.getRenderingY());
-		else g.drawImage(sheet.getSprite(2, 1), this.getRenderingX(), this.getRenderingY());
+		if (shooting && cool > 40f) g.drawImage(sheet.getSprite(2, 1), this.getRenderingX(), this.getRenderingY());
+		else g.drawImage(sheet.getSprite(0, 0), this.getRenderingX(), this.getRenderingY());
 		
 	}
 
@@ -87,101 +91,121 @@ public class Laser extends GameObject {
 			shooting = true;
 			cool = 0f;
 			
-			for (int x = this.getX() - 1; x >= 0; x--) {
-				
-				boolean found = false;
-				
-				for (GameObject object : game.getGameObjects()) {
-					
-					if (object.getY() == this.getY() && object instanceof Wall && object.getX() == x) {
-						
-						found = true;
-						break;
-						
-					}
-						
-				}
-				
-				if (!found) minX = x;
-				else break;
-					
-			}
-			
-			for (int x = this.getX() + 1; x <= game.getWidth(); x++) {
-				
-				boolean found = false;
-				
-				for (GameObject object : game.getGameObjects()) {
-					
-					if (object.getY() == this.getY() && object instanceof Wall && object.getX() == x) {
-						
-						found = true;
-						break;
-						
-					}
-						
-				}
-				
-				if (!found) maxX = x;
-				else break;
-					
-			}
-			
-			for (int y = this.getY() - 1; y >= 0; y--) {
-				
-				boolean found = false;
-				killed = false;
-				
-				for (GameObject object : game.getGameObjects()) {
-					
-					if (object.getX() == this.getX() && object instanceof Wall && object.getY() == y) {
-						
-						found = true;
-						break;
-						
-					}
-						
-				}
-				
-				if (!found) minY = y;
-				else break;
-					
-			}
-			
-			for (int y = this.getY() + 1; y <= game.getHeight(); y++) {
-				
-				boolean found = false;
-				
-				for (GameObject object : game.getGameObjects()) {
-					
-					if (object.getX() == this.getX() && object instanceof Wall && object.getY() == y) {
-						
-						found = true;
-						break;
-						
-					}
-						
-				}
-				
-				if (!found) maxY = y + 1;
-				else break;
-					
-			}
+		}
 		
-		} else if (cool > 40f && !killed) {
+		for (int x = this.getX() - 1; x >= 0; x--) {
+			
+			boolean found = false;
 			
 			for (GameObject object : game.getGameObjects()) {
 				
-				if ((object.getX() == this.getX() | object.getY() == this.getY()) && !(object instanceof Wall) && object.collidable && !(object.equals(this))) {
+				if (object.getY() == this.getY() && object instanceof Wall && object.getX() == x) {
+					
+					found = true;
+					break;
+					
+				}
+					
+			}
+			
+			if (!found) minX = x;
+			else {
+				
+				minX = x + 1;
+				break;
+				
+			}
+				
+		}
+		
+		for (int x = this.getX() + 1; x <= game.getWidth(); x++) {
+			
+			boolean found = false;
+			
+			for (GameObject object : game.getGameObjects()) {
+				
+				if (object.getY() == this.getY() && object instanceof Wall && object.getX() == x) {
+					
+					found = true;
+					break;
+					
+				}
+					
+			}
+			
+			if (!found) maxX = x;
+			else {
+				
+				maxX = x;
+				break;
+				
+			}
+				
+		}
+		
+		for (int y = this.getY() - 1; y >= 0; y--) {
+			
+			boolean found = false;
+			
+			for (GameObject object : game.getGameObjects()) {
+				
+				if (object.getX() == this.getX() && object instanceof Wall && object.getY() == y) {
+					
+					found = true;
+					break;
+					
+				}
+					
+			}
+			
+			if (!found) minY = y + 1;
+			else {
+				
+				minY = y + 1;
+				break;
+				
+			}
+				
+		}
+		
+		
+		for (int y = this.getY() + 1; y <= game.getHeight(); y++) {
+			
+			boolean found = false;
+			
+			for (GameObject object : game.getGameObjects()) {
+				
+				if (object.getX() == this.getX() && object instanceof Wall && object.getY() == y) {
+					
+					found = true;
+					break;
+					
+				}
+					
+			}
+			
+			if (!found) maxY = y;
+			else {
+				
+				maxY = y;
+				break;
+				
+			}
+				
+		}
+		
+		if (cool > 40f) {
+	
+			for (GameObject object : game.getGameObjects()) {
+				
+				if ((object.getX() == this.getX() | object.getY() == this.getY()) && !(object instanceof Wall) && object.collidable && !(object.equals(this)) && !object.isDead()) {
 					
 					object.die();
 					
 				}
 				
 			}
-			
-			killed = true;
-			
+		
 		}
 		
 	}

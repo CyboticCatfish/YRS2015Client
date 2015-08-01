@@ -279,7 +279,7 @@ public class Menu extends BasicGameState {
 				
 				try {
 					
-					Main.openWebpage(new URL(Main.SERVER_URL + "?token=" + Main.LOGIN_TOKEN));
+					Main.openWebpage(new URL(Main.SERVER_URL));
 					
 				} catch (MalformedURLException e) {
 					
@@ -291,7 +291,7 @@ public class Menu extends BasicGameState {
 				
 				try {
 					
-					Main.openWebpage(new URL(Main.SERVER_URL + "/submit?token=" + Main.LOGIN_TOKEN));
+					Main.openWebpage(new URL(Main.SERVER_URL + "/submit"));
 					
 				} catch (MalformedURLException e) {
 					

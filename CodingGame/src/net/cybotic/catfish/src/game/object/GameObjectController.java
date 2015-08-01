@@ -255,6 +255,20 @@ public class GameObjectController {
 	
 	public void explode() {
 		
+		while (target.isWaiting()) {
+			
+			try {
+				
+				Thread.sleep(50);
+				
+			} catch (InterruptedException e) {
+				
+				e.printStackTrace();
+				
+			}
+			
+		}
+		
 		if (enabled) {
 		
 			if (target instanceof Bomb) ((Bomb) target).explode();
