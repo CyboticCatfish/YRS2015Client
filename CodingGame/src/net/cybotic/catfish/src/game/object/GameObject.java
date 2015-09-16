@@ -121,31 +121,34 @@ public abstract class GameObject {
 	}
 	
 	public void moveForward() {
-		
-		moving = true;
+
+		if (!moving) {
+			
+			moving = true;
+					
+			if (dir == 0) {
 				
-		if (dir == 0) {
-			
-			if (y > 0 && !collidableObjectToFront()) y -= 1;
-			else moving = false;
-			
-		} else if (dir == 1) {
-			
-			if (x < game.getWidth() && !collidableObjectToFront()) x += 1;
-			else moving = false;
-			
-		} else if (dir == 2) {
-			
-			if (y < game.getHeight() && !collidableObjectToFront()) y += 1;
-			else moving = false;
-			
-		} else if (dir == 3) {
-			
-			if (x > 0 && !collidableObjectToFront()) x -= 1;
-			else moving = false;
+				if (y > 0 && !collidableObjectToFront()) y -= 1;
+				else moving = false;
+				
+			} else if (dir == 1) {
+				
+				if (x < game.getWidth() - 1 && !collidableObjectToFront()) x += 1;
+				else moving = false;
+				
+			} else if (dir == 2) {
+				
+				if (y < game.getHeight() - 1 && !collidableObjectToFront()) y += 1;
+				else moving = false;
+				
+			} else if (dir == 3) {
+				
+				if (x > 0 && !collidableObjectToFront()) x -= 1;
+				else moving = false;
+				
+			} else moving = false;
 			
 		}
-		
 	}
 	
 	private boolean collidableObjectToFront() {
